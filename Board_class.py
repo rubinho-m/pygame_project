@@ -2,10 +2,9 @@ import pygame
 
 
 pygame.init()
-size = (width, height) = 500, 500
-screen = pygame.display.set_mode(size)
+size = (width, height) = 1000, 800
+screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 color = ['saddlebrown', 'green']
-clock = pygame.time.Clock()
 
 class Board:
     def __init__(self, width, height, cell):
@@ -56,17 +55,3 @@ class Board:
         cell = self.get_cell(mouse_pos)
         if cell is not None:
             self.on_click(cell)
-
-fps = 10
-board = Board(17, 17, 30)
-board.render()
-running = True
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    clock.tick(fps)
-    pygame.display.flip()
-
-pygame.quit()
