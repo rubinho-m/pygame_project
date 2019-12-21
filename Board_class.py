@@ -1,10 +1,10 @@
 import pygame
 
-
 pygame.init()
 size = (width, height) = 800, 600
 screen = pygame.display.set_mode(size)
 color = ['saddlebrown', 'green']
+
 
 class Board:
     def __init__(self, width, height, cell):

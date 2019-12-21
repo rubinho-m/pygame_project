@@ -2,14 +2,26 @@ import pygame
 import os
 import sys
 from Board_class import Board
+from Volcano_class import Volcano
+from Earth_class import Earth
 
 pygame.init()
 size = (width, height) = 800, 600
 screen = pygame.display.set_mode(size)
+screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 
 FPS = 10
 
+
+def load_level(filename):
+    filename = "levels/" + filename
+    with open(filename, 'r') as mapFile:
+        level_map = [line.strip() for line in mapFile]
+
+    max_width = max(map(len, level_map))
+
+    return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 def load_image(name, color_key=None):
     fullname = os.path.join('images', name)
@@ -26,6 +38,19 @@ def load_image(name, color_key=None):
     else:
         image = image.convert_alpha()
     return image
+
+def generate_level(level):
+    new_player, x, y = None, None, None
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            Earth('empty', x, y, all_sprites)
+            if level[y][x] == '#':
+                Volcano('volcano', x, y, volcano_group, all_sprites)
+# здесь должен появитьтся спрайт с игроком
+            # elif level[y][x] == '@':
+            #     Earth('empty', x, y)
+            #     new_player = Player(x, y)
+    return new_player, x, y
 
 def terminate():
     pygame.quit()
@@ -72,19 +97,33 @@ def start_screen():
         clock.tick(FPS)
 
 def start_main():
-    board = Board(15, 12, 70)
-    board.render()
+    # board = Board(15, 12, 70)
+    # board.render()
     running = True
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        all_sprites.update()
+        volcano_group.update()
+
+        screen.fill(pygame.Color('black'))
+
+        all_sprites.draw(screen)
+        volcano_group.draw(screen)
         clock.tick(10)
         pygame.display.flip()
 
     pygame.quit()
 
+
+tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg')}
+
+all_sprites = pygame.sprite.Group()
+volcano_group = pygame.sprite.Group()
+
+player, x, y = generate_level(load_level('first.txt'))
 if not start_screen():
     start_main()
 
