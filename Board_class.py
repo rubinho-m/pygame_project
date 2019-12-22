@@ -1,44 +1,57 @@
 import pygame
 
 
+pygame.init()
+size = (width, height) = 1000, 800
+screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+color = ['saddlebrown', 'green']
+
 class Board:
-    # создание поля
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell):
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
-        # значения по умолчанию
-        self.left = 10
-        self.top = 10
-        self.cell_size = 30
+        self.left = 0
+        self.top = 0
+        self.cell_size = cell
 
-    # настройка внешнего вида
     def set_view(self, left, top, cell_size):
         self.left = left
         self.top = top
         self.cell_size = cell_size
 
     def render(self):
-        left = self.left
-        top = self.top
-        for __ in range(self.width):
-            for _ in range(self.height):
-                pygame.draw.rect(screen, pygame.Color('white'), (left, top, self.cell_size, self.cell_size), 1)
-                top += self.cell_size
-            left += self.cell_size
-            top = self.top
+        for i in range(self.height):
+            for j in range(self.width):
+                x = self.board[i][j]
+                if x == 0:
+                    pygame.draw.rect(screen, pygame.Color(color[x]), (self.left + j * self.cell_size,
+                                                                      self.top + i * self.cell_size,
+                                                                      self.cell_size,
+                                                                      self.cell_size))
+                else:
+                    pygame.draw.rect(screen, pygame.Color(color[x]), (self.left + j * self.cell_size,
+                                                                      self.top + i * self.cell_size,
+                                                                      self.cell_size,
+                                                                      self.cell_size))
+                pygame.draw.rect(screen, pygame.Color('black'), (self.left + j * self.cell_size,
+                                                                 self.top + i * self.cell_size,
+                                                                 self.cell_size, self.cell_size), 1)
 
+    def get_cell(self, mouse_pos):
+        for i in range(self.height):
+            for j in range(self.width):
+                x, y = self.left + j * self.cell_size, self.top + i * self.cell_size
+                x1, y1 = x + self.cell_size, y + self.cell_size
+                if x <= mouse_pos[0] <= x1 and y <= mouse_pos[1] <= y1:
+                    return i, j
+        return None
 
-pygame.init()
-size = w, h = 600, 600
-screen = pygame.display.set_mode(size)
-running = True
-board = Board(4, 3)
-board.set_view(100, 100, 50)
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    screen.fill((0, 0, 0))
-    board.render()
-    pygame.display.flip()
+    def on_click(self, cell_coords):
+        i, j = cell_coords
+        self.board[i][j] ^= 1
+
+    def process_click(self, mouse_pos):
+        cell = self.get_cell(mouse_pos)
+        if cell is not None:
+            self.on_click(cell)
