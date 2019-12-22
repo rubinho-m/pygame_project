@@ -4,6 +4,7 @@ import sys
 from Board_class import Board
 from Volcano_class import Volcano
 from Earth_class import Earth
+from Plane_class import Plane
 
 pygame.init()
 size = (width, height) = 800, 600
@@ -46,6 +47,8 @@ def generate_level(level):
             Earth('empty', x, y, all_sprites)
             if level[y][x] == '#':
                 Volcano('volcano', x, y, volcano_group, all_sprites)
+            elif level[y][x] == 'P':
+                Plane('plane', x, y, plane_group, all_sprites)
 # здесь должен появитьтся спрайт с игроком
             # elif level[y][x] == '@':
             #     Earth('empty', x, y)
@@ -107,21 +110,24 @@ def start_main():
                 running = False
         all_sprites.update()
         volcano_group.update()
+        plane_group.update()
 
         screen.fill(pygame.Color('black'))
 
         all_sprites.draw(screen)
         volcano_group.draw(screen)
+        plane_group.draw(screen)
         clock.tick(10)
         pygame.display.flip()
 
     pygame.quit()
 
 
-tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg')}
+tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg'), 'plane': load_image('plane.png', -1)}
 
 all_sprites = pygame.sprite.Group()
 volcano_group = pygame.sprite.Group()
+plane_group = pygame.sprite.Group()
 
 player, x, y = generate_level(load_level('first.txt'))
 if not start_screen():
