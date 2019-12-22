@@ -4,8 +4,7 @@ import sys
 from Board_class import Board
 from Volcano_class import Volcano
 from Earth_class import Earth
-from anim_sprite import Player
-from buttons import Button
+from Plane_class import Plane
 
 pygame.init()
 size = (width, height) = 800, 600
@@ -13,7 +12,7 @@ screen = pygame.display.set_mode(size)
 screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 
-FPS = 25
+FPS = 10
 
 
 def load_level(filename):
@@ -24,7 +23,6 @@ def load_level(filename):
     max_width = max(map(len, level_map))
 
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
-
 
 def load_image(name, color_key=None):
     fullname = os.path.join('images', name)
@@ -42,7 +40,6 @@ def load_image(name, color_key=None):
         image = image.convert_alpha()
     return image
 
-
 def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
@@ -50,13 +47,13 @@ def generate_level(level):
             Earth('empty', x, y, all_sprites)
             if level[y][x] == '#':
                 Volcano('volcano', x, y, volcano_group, all_sprites)
-    # здесь должен появитьтся спрайт с игроком
-    # new_player = Player(load_image("player_anim.png", -1), 7, 4, 0, 0)
-    # elif level[y][x] == '@':
-    #     Earth('empty', x, y)
-    #     new_player = Player(x, y)
+            elif level[y][x] == 'P':
+                Plane('plane', x, y, plane_group, all_sprites)
+# здесь должен появитьтся спрайт с игроком
+            # elif level[y][x] == '@':
+            #     Earth('empty', x, y)
+            #     new_player = Player(x, y)
     return new_player, x, y
-
 
 def terminate():
     pygame.quit()
@@ -64,7 +61,7 @@ def terminate():
 
 
 def start_screen():
-    intro_text = ["Эра динозавров", "",
+    intro_text = ["Ера динозавров", "",
                   "Вы попали в джунгли Юрского периода,",
                   "и Вам предстоит добраться до своего",
                   "реактивного самолёта, минуя динозавров",
@@ -98,140 +95,41 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                return MENU
+                return False
         pygame.display.flip()
         clock.tick(FPS)
-
 
 def start_main():
     # board = Board(15, 12, 70)
     # board.render()
-    player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
-    player.rect.x = 250
-    player.rect.y = 200
-    player.rect.w = player.player_scale
-    player.rect.h = player.player_scale
-    step = 5
     running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                terminate()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_RIGHT]:
-            player.rotate = False
-            player.rect.x += step
-            player_sprite.update()
-            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
-            if len(collide) != 0:
-                player.rect.x -= step
-        if keys[pygame.K_LEFT]:
-            player.rotate = True
-            player.rect.x -= step
-            player_sprite.update()
-            player.image = pygame.transform.flip(player.image, True, False)
-            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
-            if len(collide) != 0:
-                player.rect.x += step
-
-        if keys[pygame.K_UP]:
-            player.rect.y -= step
-            player_sprite.update()
-            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
-            if len(collide) != 0:
-                player.rect.y += step
-        if keys[pygame.K_DOWN]:
-            player.rect.y += step
-            player_sprite.update()
-            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
-            if len(collide) != 0:
-                player.rect.y -= step
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
-            player.state = False
-        else:
-            player.state = True
+                running = False
         all_sprites.update()
         volcano_group.update()
+        plane_group.update()
+
         screen.fill(pygame.Color('black'))
+
         all_sprites.draw(screen)
         volcano_group.draw(screen)
-        player_sprite.update()
-        player_sprite.draw(screen)
-        clock.tick(FPS)
+        plane_group.draw(screen)
+        clock.tick(10)
         pygame.display.flip()
+
     pygame.quit()
 
 
-def menu():
-    running = True
-    fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
-    screen.blit(fon, (0, 0))
-    w = 150
-    h = 50
-    play = Button(button_group, (50, 50, w, h), screen, 'ИГРАТЬ', start_main)
-    rules = Button(button_group, (50, 150, w, h), screen, 'ПРАВИЛА', start_screen)
-    table = Button(button_group, (50, 250, w, h), screen, 'ЛИДЕРЫ', None)
-    out = Button(button_group, (50, 350, w, h), screen, 'ВЫХОД', terminate)
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            if event.type == pygame.MOUSEMOTION:
-                pos = event.pos
-                if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= play.coords[1] + h:
-                    play.mouse_down = True
-                else:
-                    play.mouse_down = False
-                if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= rules.coords[
-                    1] + h:
-                    rules.mouse_down = True
-                else:
-                    rules.mouse_down = False
-                if table.coords[0] <= pos[0] <= table.coords[0] + w and table.coords[1] <= pos[1] <= table.coords[
-                    1] + h:
-                    table.mouse_down = True
-                else:
-                    table.mouse_down = False
-                if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= out.coords[1] + h:
-                    out.mouse_down = True
-                else:
-                    out.mouse_down = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = event.pos
-                if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= play.coords[1] + h:
-                    return GAME
-                if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= rules.coords[
-                    1] + h:
-                    return GREETING
-                if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= out.coords[1] + h:
-                    return EXIT
-
-        clock.tick(FPS)
-        button_group.update()
-        pygame.display.flip()
-    pygame.quit()
-
-
-tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg')}
+tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg'), 'plane': load_image('plane.png', -1)}
 
 all_sprites = pygame.sprite.Group()
-player_sprite = pygame.sprite.Group()
 volcano_group = pygame.sprite.Group()
-button_group = pygame.sprite.Group()
-
-GREETING = 0
-MENU = 1
-GAME = 2
-RESULTS = 3
-EXIT = 4
-
-todo = {GREETING: start_screen,
-        MENU: menu,
-        GAME: start_main,
-        RESULTS: None,
-        EXIT: terminate}
+plane_group = pygame.sprite.Group()
 
 player, x, y = generate_level(load_level('first.txt'))
-state = GREETING
-while True:
-    state = todo[state]()
+if not start_screen():
+    start_main()
+
