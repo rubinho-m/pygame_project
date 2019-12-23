@@ -10,8 +10,9 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 all_sprites = pygame.sprite.Group()
-
-
+player_sprite = pygame.sprite.Group()
+#
+#
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
     try:
@@ -29,10 +30,10 @@ def load_image(name, color_key=None):
     return image
 
 
-class AnimatedSprite(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
 
     def __init__(self, sheet, columns, rows, x, y):
-        super().__init__(all_sprites)
+        super().__init__(player_sprite)
         self.scale = 140
         self.rotate = False
         self.frames = []
@@ -58,11 +59,11 @@ class AnimatedSprite(pygame.sprite.Sprite):
             self.image = self.frames[self.cur_frame]
         else:
             if self.rotate:
-                self.image = pygame.transform.flip(player.image, True, False)
+                self.image = pygame.transform.flip(self.image, True, False)
             self.image = self.idle
 
 
-player = AnimatedSprite(load_image("player_anim.png", -1), 7, 4, 0, 0)
+player = Player(load_image("player_anim.png", -1), 7, 4, 0, 0)
 running = True
 
 while running:
@@ -90,8 +91,8 @@ while running:
     else:
         player.state = True
     screen.fill(pygame.Color("black"))
-    all_sprites.draw(screen)
-    all_sprites.update()
+    player_sprite.draw(screen)
+    player_sprite.update()
     pygame.display.flip()
     clock.tick(FPS)
 
