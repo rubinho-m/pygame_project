@@ -4,6 +4,7 @@ import sys
 from Board_class import Board
 from Volcano_class import Volcano
 from Earth_class import Earth
+from anim_sprite import Player
 
 pygame.init()
 size = (width, height) = 800, 600
@@ -22,40 +23,6 @@ def load_level(filename):
     max_width = max(map(len, level_map))
 
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
-
-
-class Player(pygame.sprite.Sprite):
-
-    def __init__(self, sheet, columns, rows, x, y):
-        super().__init__(player_sprite)
-        sheet = pygame.transform.scale(sheet, (500, 400))
-        self.scale = 90
-        self.rotate = False
-        self.frames = []
-        self.cut_sheet(sheet, columns, rows)
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.idle = load_image("grass.png", -1)
-        self.idle = pygame.transform.scale(self.idle, (self.scale, self.scale))
-        self.rect = self.rect.move(x, y)
-        self.state = True
-
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns, sheet.get_height() // rows)
-        for j in range(rows):
-            for i in range(columns):
-                if i != columns - 1:
-                    frame_location = (self.rect.w * i, self.rect.h * j)
-                    self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
-
-    def update(self):
-        if self.state:
-            self.cur_frame = (self.cur_frame + 1) % len(self.frames)
-            self.image = self.frames[self.cur_frame]
-        else:
-            if self.rotate:
-                self.image = pygame.transform.flip(self.image, True, False)
-            self.image = self.idle
 
 
 def load_image(name, color_key=None):
@@ -130,7 +97,6 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                print(1)
                 return False
         pygame.display.flip()
         clock.tick(FPS)
@@ -139,9 +105,8 @@ def start_screen():
 def start_main():
     # board = Board(15, 12, 70)
     # board.render()
-    player = Player(load_image("player_anim.png", -1), 7, 4, 0, 0)
+    player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
     running = True
-
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -156,6 +121,7 @@ def start_main():
             player.rect.x -= 10
             player_sprite.update()
             player.image = pygame.transform.flip(player.image, True, False)
+
         if keys[pygame.K_UP]:
             player.rect.y -= 10
             player_sprite.update()
@@ -168,13 +134,11 @@ def start_main():
             player.state = True
         all_sprites.update()
         volcano_group.update()
-
-        # screen.fill(pygame.Color('black'))
-
+        screen.fill(pygame.Color('black'))
         all_sprites.draw(screen)
         volcano_group.draw(screen)
-        player_sprite.draw(screen)
         player_sprite.update()
+        player_sprite.draw(screen)
         clock.tick(FPS)
         pygame.display.flip()
     pygame.quit()
