@@ -12,7 +12,7 @@ screen = pygame.display.set_mode(size)
 screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 
-FPS = 30
+FPS = 25
 
 
 def load_level(filename):
@@ -106,6 +106,11 @@ def start_main():
     # board = Board(15, 12, 70)
     # board.render()
     player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
+    player.rect.x = 250
+    player.rect.y = 200
+    player.rect.w = player.player_scale
+    player.rect.h = player.player_scale
+    step = 5
     running = True
     while running:
         for event in pygame.event.get():
@@ -114,20 +119,32 @@ def start_main():
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
             player.rotate = False
-            player.rect.x += 10
+            player.rect.x += step
             player_sprite.update()
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.x -= step
         if keys[pygame.K_LEFT]:
             player.rotate = True
-            player.rect.x -= 10
+            player.rect.x -= step
             player_sprite.update()
             player.image = pygame.transform.flip(player.image, True, False)
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.x += step
 
         if keys[pygame.K_UP]:
-            player.rect.y -= 10
+            player.rect.y -= step
             player_sprite.update()
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.y += step
         if keys[pygame.K_DOWN]:
-            player.rect.y += 10
+            player.rect.y += step
             player_sprite.update()
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.y -= step
         if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
             player.state = False
         else:

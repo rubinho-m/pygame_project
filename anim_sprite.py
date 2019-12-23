@@ -26,7 +26,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,group, sheet, columns, rows, x, y):
         super().__init__(group)
         self.scale = 140
-        self.player_scale = 100
+        self.player_scale = 60
         self.rotate = False
         self.frames = []
         self.frames_rotate = []
