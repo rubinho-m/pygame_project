@@ -52,10 +52,13 @@ def generate_level(level):
                 Volcano('volcano', x, y, volcano_group, all_sprites)
             elif level[y][x] == 'P':
                 Plane('plane', x, y, plane_group, all_sprites)
-# здесь должен появитьтся спрайт с игроком
-            # elif level[y][x] == '@':
-            #     Earth('empty', x, y)
-            #     new_player = Player(x, y)
+            elif level[y][x] == '@':
+                new_player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
+                # умножение на 70 и 60, так как именно такие размеры у картинки вулкана
+                new_player.rect.x = x * 70
+                new_player.rect.y = y * 60
+                new_player.rect.w = new_player.player_scale
+                new_player.rect.h = new_player.player_scale
     return new_player, x, y
 
 def terminate():
@@ -104,13 +107,6 @@ def start_screen():
 
 
 def start_main():
-    # board = Board(15, 12, 70)
-    # board.render()
-    player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
-    player.rect.x = 250
-    player.rect.y = 200
-    player.rect.w = player.player_scale
-    player.rect.h = player.player_scale
     step = 5
     running = True
     while running:
