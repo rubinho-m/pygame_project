@@ -4,6 +4,7 @@ import sys
 from Board_class import Board
 from Volcano_class import Volcano
 from Earth_class import Earth
+from anim_sprite import Player
 from Plane_class import Plane
 
 pygame.init()
@@ -12,7 +13,7 @@ screen = pygame.display.set_mode(size)
 screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 
-FPS = 10
+FPS = 25
 
 
 def load_level(filename):
@@ -23,6 +24,7 @@ def load_level(filename):
     max_width = max(map(len, level_map))
 
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+
 
 def load_image(name, color_key=None):
     fullname = os.path.join('images', name)
@@ -40,6 +42,7 @@ def load_image(name, color_key=None):
         image = image.convert_alpha()
     return image
 
+
 def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
@@ -49,10 +52,13 @@ def generate_level(level):
                 Volcano('volcano', x, y, volcano_group, all_sprites)
             elif level[y][x] == 'P':
                 Plane('plane', x, y, plane_group, all_sprites)
-# здесь должен появитьтся спрайт с игроком
-            # elif level[y][x] == '@':
-            #     Earth('empty', x, y)
-            #     new_player = Player(x, y)
+            elif level[y][x] == '@':
+                new_player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
+                # умножение на 70 и 60, так как именно такие размеры у картинки вулкана
+                new_player.rect.x = x * 70
+                new_player.rect.y = y * 60
+                new_player.rect.w = new_player.player_scale
+                new_player.rect.h = new_player.player_scale
     return new_player, x, y
 
 def terminate():
@@ -99,25 +105,60 @@ def start_screen():
         pygame.display.flip()
         clock.tick(FPS)
 
-def start_main():
-    # board = Board(15, 12, 70)
-    # board.render()
-    running = True
 
+def start_main():
+    step = 5
+    running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT]:
+            player.rotate = False
+            player.rect.x += step
+            player_sprite.update()
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.x -= step
+        if keys[pygame.K_LEFT]:
+            player.rotate = True
+            player.rect.x -= step
+            player_sprite.update()
+            player.image = pygame.transform.flip(player.image, True, False)
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.x += step
+
+        if keys[pygame.K_UP]:
+            player.rect.y -= step
+            player_sprite.update()
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.y += step
+        if keys[pygame.K_DOWN]:
+            player.rect.y += step
+            player_sprite.update()
+            collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
+            if len(collide) != 0:
+                player.rect.y -= step
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
+            player.state = False
+        else:
+            player.state = True
         all_sprites.update()
         volcano_group.update()
         plane_group.update()
+        player_sprite.update()
 
         screen.fill(pygame.Color('black'))
 
         all_sprites.draw(screen)
         volcano_group.draw(screen)
         plane_group.draw(screen)
-        clock.tick(10)
+
+        player_sprite.draw(screen)
+        clock.tick(FPS)
         pygame.display.flip()
 
     pygame.quit()
@@ -126,6 +167,7 @@ def start_main():
 tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg'), 'plane': load_image('plane.png', -1)}
 
 all_sprites = pygame.sprite.Group()
+player_sprite = pygame.sprite.Group()
 volcano_group = pygame.sprite.Group()
 plane_group = pygame.sprite.Group()
 
