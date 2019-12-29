@@ -26,4 +26,4 @@ class Plane(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *args):
         super().__init__(args)
         self.image = tile_images[tile_type]
-        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+        self.rect = self.image.get_rect().move(pos_x, pos_y)
