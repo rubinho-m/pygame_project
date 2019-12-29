@@ -51,12 +51,14 @@ def generate_level(level):
             Earth('empty', x, y, all_sprites)
             if level[y][x] == '#':
                 Volcano('volcano', x, y, volcano_group, all_sprites)
-    # здесь должен появитьтся спрайт с игроком
-    # new_player = Player(load_image("player_anim.png", -1), 7, 4, 0, 0)
-    # elif level[y][x] == '@':
-    #     Earth('empty', x, y)
-    #     new_player = Player(x, y)
-    return new_player, x, y
+            if level[y][x] == '@':
+                Earth('empty', x, y)
+                new_player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, x * 70, y * 60)
+            if level[y][x] == 'P':
+                plane = Plane('plane', x * 70, y * 60)
+                plane.rect.x = x * 70
+                plane.rect.y = y * 60
+    return new_player, x, y, plane
 
 
 def terminate():
@@ -107,12 +109,11 @@ def start_screen():
 def start_main():
     # board = Board(15, 12, 70)
     # board.render()
-    player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
-    plane = Plane(plane_group)
-    player.rect.x = 290
-    player.rect.y = 200
     player.rect.w = player.player_scale
     player.rect.h = player.player_scale
+    plane.rect.w = 100
+    plane.rect.h = 100
+    plane_group.add(plane)
     step = 5
     running = True
     while running:
@@ -160,7 +161,6 @@ def start_main():
         player_sprite.update()
         player_sprite.draw(screen)
         plane_group.draw(screen)
-        plane_group.update()
         clock.tick(FPS)
         pygame.display.flip()
     pygame.quit()
@@ -237,7 +237,7 @@ todo = {GREETING: start_screen,
         RESULTS: None,
         EXIT: terminate}
 
-player, x, y = generate_level(load_level('first.txt'))
+player, x, y, plane = generate_level(load_level('first.txt'))
 state = GREETING
 while True:
     state = todo[state]()
