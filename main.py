@@ -6,6 +6,7 @@ from Volcano_class import Volcano
 from Earth_class import Earth
 from anim_sprite import Player
 from buttons import Button
+from Plane_class import Plane
 
 pygame.init()
 size = (width, height) = 800, 600
@@ -107,7 +108,8 @@ def start_main():
     # board = Board(15, 12, 70)
     # board.render()
     player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, 0, 0)
-    player.rect.x = 250
+    plane = Plane(plane_group)
+    player.rect.x = 290
     player.rect.y = 200
     player.rect.w = player.player_scale
     player.rect.h = player.player_scale
@@ -157,6 +159,8 @@ def start_main():
         volcano_group.draw(screen)
         player_sprite.update()
         player_sprite.draw(screen)
+        plane_group.draw(screen)
+        plane_group.update()
         clock.tick(FPS)
         pygame.display.flip()
     pygame.quit()
@@ -212,12 +216,14 @@ def menu():
     pygame.quit()
 
 
-tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg')}
+tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg'),
+               'plane': load_image('plane.png', -1)}
 
 all_sprites = pygame.sprite.Group()
 player_sprite = pygame.sprite.Group()
 volcano_group = pygame.sprite.Group()
 button_group = pygame.sprite.Group()
+plane_group = pygame.sprite.Group()
 
 GREETING = 0
 MENU = 1
