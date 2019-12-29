@@ -19,7 +19,9 @@ def load_image(name, color_key=None):
     return image
 
 
-tile_width = tile_height = 70
+tile_width = 70
+tile_height = 60
+
 tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg'), 'plane': load_image('plane.png', -1)}
 
 class Plane(pygame.sprite.Sprite):
