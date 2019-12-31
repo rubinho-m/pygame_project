@@ -23,6 +23,7 @@ tile_width = 70
 tile_height = 60
 tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg')}
 
+
 class Earth(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *args):
         super().__init__(args)

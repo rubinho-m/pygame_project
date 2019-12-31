@@ -7,6 +7,8 @@ from Earth_class import Earth
 from anim_sprite import Player
 from buttons import Button
 from Plane_class import Plane
+from Dino_class import Dino
+from FireBall_class import FireBall
 
 pygame.init()
 size = (width, height) = 800, 600
@@ -51,12 +53,56 @@ def generate_level(level):
             Earth('empty', x, y, all_sprites)
             if level[y][x] == '#':
                 Volcano('volcano', x, y, volcano_group, all_sprites)
-            if level[y][x] == '@':
-                Earth('empty', x, y)
-                new_player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, x * 70, y * 60)
-            if level[y][x] == 'P':
+
+            elif level[y][x] == '@':
+                new_player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, x * 70,
+                                    y * 60)
+                pos_x, pos_y = x, y
+
+            elif level[y][x] == 'P':
                 plane = Plane('plane', x * 70, y * 60, plane_group, all_sprites)
-    return new_player, x, y, plane
+    # второй цикл добавляет динозавров на поле с определением движения пламени
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            if level[y][x] == 'D':
+                vect = count_space(x, y)
+                Dino(x, y, vect, dino_group, all_sprites)
+                FireBall(x * 70, y * 60, vect, fire_group, all_sprites)
+    return new_player, pos_x, pos_y, plane
+
+
+def count_space(x, y):
+    kr, kl, ku, kd = 0, 0, 0, 0
+    for xx in range(x - 1, -1, -1):
+        spr = Volcano('volcano', xx, y)
+        if pygame.sprite.spritecollideany(spr, volcano_group, False):
+            break
+        kl += 1
+    for xx in range(x + 1, len(load_level('first.txt')[0])):
+        spr = Volcano('volcano', xx, y)
+        if pygame.sprite.spritecollideany(spr, volcano_group, False):
+            break
+        kr += 1
+    for yy in range(y - 1, -1, -1):
+        spr = Volcano('volcano', x, yy)
+        if pygame.sprite.spritecollideany(spr, volcano_group, False):
+            break
+        kd += 1
+    for yy in range(y + 1, len(load_level('first.txt'))):
+        spr = Volcano('volcano', x, yy)
+        if pygame.sprite.spritecollideany(spr, volcano_group, False):
+            break
+        ku += 1
+
+    mx = max(ku, kd, kr, kl)
+    if mx == ku:
+        return (0, ku)
+    elif mx == kd:
+        return (0, -kd)
+    elif mx == kl:
+        return (-kl, 0)
+    else:
+        return (kr, 0)
 
 
 def terminate():
@@ -142,18 +188,29 @@ def start_main():
             collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
             if len(collide) != 0:
                 player.rect.y -= step
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not \
+                keys[pygame.K_RIGHT]:
             player.state = False
         else:
             player.state = True
+
+        for fire in fire_group:
+            if pygame.sprite.spritecollideany(fire, volcano_group, False):
+                fire.return_back()
+
         all_sprites.update()
         volcano_group.update()
+        player_sprite.update()
+        fire_group.update()
+
         screen.fill(pygame.Color('black'))
+
+        fire_group.draw(screen)
         all_sprites.draw(screen)
         volcano_group.draw(screen)
-        player_sprite.update()
         player_sprite.draw(screen)
         plane_group.draw(screen)
+
         clock.tick(FPS)
         pygame.display.flip()
     pygame.quit()
@@ -175,32 +232,39 @@ def menu():
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= play.coords[1] + h:
+                if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
+                        play.coords[1] + h:
                     play.mouse_down = True
                 else:
                     play.mouse_down = False
-                if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= rules.coords[
-                    1] + h:
+                if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= \
+                        rules.coords[
+                            1] + h:
                     rules.mouse_down = True
                 else:
                     rules.mouse_down = False
-                if table.coords[0] <= pos[0] <= table.coords[0] + w and table.coords[1] <= pos[1] <= table.coords[
-                    1] + h:
+                if table.coords[0] <= pos[0] <= table.coords[0] + w and table.coords[1] <= pos[1] <= \
+                        table.coords[
+                            1] + h:
                     table.mouse_down = True
                 else:
                     table.mouse_down = False
-                if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= out.coords[1] + h:
+                if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= \
+                        out.coords[1] + h:
                     out.mouse_down = True
                 else:
                     out.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= play.coords[1] + h:
+                if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
+                        play.coords[1] + h:
                     return GAME
-                if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= rules.coords[
-                    1] + h:
+                if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= \
+                        rules.coords[
+                            1] + h:
                     return GREETING
-                if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= out.coords[1] + h:
+                if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= \
+                        out.coords[1] + h:
                     return EXIT
 
         clock.tick(FPS)
@@ -217,6 +281,8 @@ player_sprite = pygame.sprite.Group()
 volcano_group = pygame.sprite.Group()
 button_group = pygame.sprite.Group()
 plane_group = pygame.sprite.Group()
+dino_group = pygame.sprite.Group()
+fire_group = pygame.sprite.Group()
 
 GREETING = 0
 MENU = 1
