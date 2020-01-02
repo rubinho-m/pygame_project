@@ -20,10 +20,12 @@ def load_image(name, color_key=None):
 
 
 tile_width = tile_height = 70
-tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg'), 'plane': load_image('plane.png', -1)}
+tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('earth.jpg'),
+               'plane': load_image('plane.png', -1)}
+
 
 class Plane(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *args):
         super().__init__(args)
         self.image = tile_images[tile_type]
-        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+        self.rect = self.image.get_rect().move(pos_x, pos_y)

@@ -55,7 +55,7 @@ def generate_level(level):
                 Earth('empty', x, y)
                 new_player = Player(player_sprite, load_image("player_anim.png", -1), 7, 4, x * 70, y * 60)
             if level[y][x] == 'P':
-                plane = Plane('plane', x * 70, y * 60)
+                plane = Plane('plane', x * 70, y * 60, plane_group)
                 plane.rect.x = x * 70
                 plane.rect.y = y * 60
     return new_player, x, y, plane
@@ -111,9 +111,7 @@ def start_main():
     # board.render()
     player.rect.w = player.player_scale
     player.rect.h = player.player_scale
-    plane.rect.w = 100
-    plane.rect.h = 100
-    plane_group.add(plane)
+    # plane_group.add(plane)
     step = 5
     running = True
     while running:
