@@ -4,7 +4,7 @@ import math
 
 class Button(pygame.sprite.Sprite):
 
-    def __init__(self, group, coords, sc, text, func):
+    def __init__(self, group, coords, sc, text, func, left=False):
         super().__init__(group)
         self.scale = 140
         self.coords = coords
@@ -17,6 +17,7 @@ class Button(pygame.sprite.Sprite):
         self.font_size = 30
         self.font = pygame.font.Font(None, self.font_size)
         self.string_rendered = self.font.render(self.text, 1, pygame.Color('black'))
+        self.left = left
 
     def update(self):
         if not self.mouse_down:
@@ -29,5 +30,7 @@ class Button(pygame.sprite.Sprite):
             x = self.coords[0] + self.coords[2] // 2 - self.coords[2] // 4
         else:
             x = self.coords[0] + self.coords[2] // 2 - self.coords[2] // 3.5
-        y = self.coords[1] + self.coords[3] // 2 - self.font_size // 2
+        if self.left:
+            x = self.coords[0] * 1.2
+        y = self.coords[1] + self.coords[3] // 2 - self.font_size // 3.5
         self.sc.blit(self.string_rendered, (x, y))

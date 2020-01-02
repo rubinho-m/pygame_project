@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
         self.idle = load_image("grass.png", -1)
         self.idle = pygame.transform.scale(self.idle, (self.scale, self.scale))
         self.rect = self.rect.move(x, y)
-        self.state = True
+        self.state = False
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns, sheet.get_height() // rows)
