@@ -18,6 +18,8 @@ screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 
 FPS = 25
+k = 0
+first_time = 0
 
 
 def load_level(filename):
@@ -154,6 +156,7 @@ def start_screen():
 
 
 def start_main(new_game=False):
+    global k, first_time, new_time
     if new_game:
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
@@ -167,6 +170,9 @@ def start_main(new_game=False):
     cancel = Button(button_group_game, (0, 0, w, h), screen, 'МЕНЮ', menu, True)
     METEORITEEVENT = 30
     pygame.time.set_timer(METEORITEEVENT, 6500)
+    if new_game or k == 0:
+        first_time = pygame.time.get_ticks()
+    k += 1
 
     while running:
         for event in pygame.event.get():
@@ -255,6 +261,7 @@ def start_main(new_game=False):
             player.rect.x = pos_x * 70
             player.rect.y = pos_y * 60
             return LOSE
+        new_time = pygame.time.get_ticks()
 
         all_sprites.update()
         volcano_group.update()
@@ -266,13 +273,20 @@ def start_main(new_game=False):
         fire_group.draw(screen)
         volcano_group.draw(screen)
         plane_group.draw(screen)
-        button_group_game.update()
         meteorites_group.draw(screen)
         all_sprites.draw(screen)
         player_sprite.draw(screen)
+        button_group_game.update()
+
+        time = str((new_time - first_time) // 1000)
+        font_size = 100
+        font = pygame.font.Font('16908.otf', font_size)
+        string_rendered = font.render(time, 1, pygame.Color('black'))
+        screen.blit(string_rendered, (width // 2, 0))
 
         clock.tick(FPS)
         pygame.display.flip()
+
     pygame.quit()
 
 
