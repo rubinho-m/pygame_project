@@ -56,10 +56,14 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.frames_rotate[self.cur_frame]
             else:
                 self.image = self.frames[self.cur_frame]
+            self.rect.w = 60
+            self.rect.h = 60
         else:
             if self.rotate:
                 self.image = pygame.transform.flip(self.image, True, False)
             self.image = self.idle
+            self.rect.w = 70
+            self.rect.h = 60
         self.image = pygame.transform.scale(self.image, (self.player_scale, self.player_scale))
 
 

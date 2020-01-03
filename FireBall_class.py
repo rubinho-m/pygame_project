@@ -26,12 +26,15 @@ tile_images = {'volcano': load_image('volcano.png', -1), 'empty': load_image('ea
 
 
 class FireBall(pygame.sprite.Sprite):
-    def __init__(self, x, y, vect, *args):
+    def __init__(self, x, y, vect, ismeteor, *args):
         super().__init__(args)
         self.frames = []
         self.cut_sheet(load_image("fire.png"), 8, 4)
         self.cur_frame = 0
+        self.flag = ismeteor
         self.image = self.frames[self.cur_frame]
+        if self.flag:
+            self.image = pygame.transform.scale(self.image, (70, 70))
 
         self.vector = vect
 
@@ -68,6 +71,8 @@ class FireBall(pygame.sprite.Sprite):
     def update(self):
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
+        if self.flag:
+            self.image = pygame.transform.scale(self.image, (70, 70))
 
         if self.appear and self.cur_frame == 11:
             self.rect.x = self.start_x
@@ -81,7 +86,10 @@ class FireBall(pygame.sprite.Sprite):
             elif y < 0:
                 self.move(self.rect.x, self.rect.y - 3)
             else:
-                self.move(self.rect.x, self.rect.y + 3)
+                if not self.flag:
+                    self.move(self.rect.x, self.rect.y + 3)
+                else:
+                    self.move(self.rect.x, self.rect.y + 30)
 
         if self.appear:
             self.appear = False

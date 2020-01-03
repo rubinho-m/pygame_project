@@ -1,6 +1,7 @@
 import pygame
 import os
 import sys
+import random
 from Board_class import Board
 from Volcano_class import Volcano
 from Earth_class import Earth
@@ -61,13 +62,15 @@ def generate_level(level):
 
             elif level[y][x] == 'P':
                 plane = Plane('plane', x * 70, y * 60, plane_group, all_sprites)
+            elif level[y][x] == '.':
+                Earth('empty', x, y, empty_group)
     # второй цикл добавляет динозавров на поле с определением движения пламени
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == 'D':
                 vect = count_space(x, y)
                 Dino(x, y, vect, dino_group, all_sprites)
-                FireBall(x * 70, y * 60, vect, fire_group, all_sprites)
+                FireBall(x * 70, y * 60, vect, False, fire_group, all_sprites)
     return new_player, pos_x, pos_y, plane
 
 
@@ -162,8 +165,13 @@ def start_main(new_game=False):
     h = 60
     button_group_game = pygame.sprite.Group()
     cancel = Button(button_group_game, (0, 0, w, h), screen, 'МЕНЮ', menu, True)
+    METEORITEEVENT = 30
+    pygame.time.set_timer(METEORITEEVENT, 6500)
+
     while running:
         for event in pygame.event.get():
+            if event.type == METEORITEEVENT:
+                FireBall(random.randint(0, width), 0, (0, 1), True, meteorites_group, all_sprites)
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEMOTION:
@@ -219,6 +227,10 @@ def start_main(new_game=False):
         collide_plane = pygame.sprite.groupcollide(player_sprite, plane_group, False, False)
         collide_fire = pygame.sprite.groupcollide(player_sprite, fire_group, False, False)
         collide_dino = pygame.sprite.groupcollide(player_sprite, dino_group, False, False)
+        collide_meteorite = pygame.sprite.groupcollide(player_sprite, meteorites_group, False, False)
+        for meteorite in meteorites_group:
+            if meteorite.rect.y >= 300:
+                meteorites_group.remove(meteorite)
         if len(collide_plane) != 0:
             player.rect.x = pos_x * 70
             player.rect.y = pos_y * 60
@@ -226,6 +238,14 @@ def start_main(new_game=False):
         if len(collide_fire) != 0:
             for fire in fire_group:
                 fire.return_back()
+            if not player.state:
+                player.rect.x = pos_x * 70
+                player.rect.y = pos_y * 60
+            else:
+                return LOSE
+        if len(collide_meteorite) != 0:
+            for meteorite in meteorites_group:
+                meteorites_group.remove(meteorite)
             if not player.state:
                 player.rect.x = pos_x * 70
                 player.rect.y = pos_y * 60
@@ -244,11 +264,12 @@ def start_main(new_game=False):
         screen.fill(pygame.Color('black'))
 
         fire_group.draw(screen)
-        all_sprites.draw(screen)
         volcano_group.draw(screen)
-        player_sprite.draw(screen)
         plane_group.draw(screen)
         button_group_game.update()
+        meteorites_group.draw(screen)
+        all_sprites.draw(screen)
+        player_sprite.draw(screen)
 
         clock.tick(FPS)
         pygame.display.flip()
@@ -410,6 +431,11 @@ button_group = pygame.sprite.Group()
 plane_group = pygame.sprite.Group()
 dino_group = pygame.sprite.Group()
 fire_group = pygame.sprite.Group()
+empty_group = pygame.sprite.Group()
+meteorites_group = pygame.sprite.Group()
+
+tile_width = 70
+tile_height = 60
 
 GREETING = 0
 MENU = 1
