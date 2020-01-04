@@ -240,6 +240,7 @@ def start_main(new_game=False):
         if len(collide_plane) != 0:
             player.rect.x = pos_x * 70
             player.rect.y = pos_y * 60
+            k = 0
             return RESULTS
         if len(collide_fire) != 0:
             for fire in fire_group:
@@ -248,6 +249,7 @@ def start_main(new_game=False):
                 player.rect.x = pos_x * 70
                 player.rect.y = pos_y * 60
             else:
+                k = 0
                 return LOSE
         if len(collide_meteorite) != 0:
             for meteorite in meteorites_group:
@@ -256,10 +258,12 @@ def start_main(new_game=False):
                 player.rect.x = pos_x * 70
                 player.rect.y = pos_y * 60
             else:
+                k = 0
                 return LOSE
         if len(collide_dino) != 0:
             player.rect.x = pos_x * 70
             player.rect.y = pos_y * 60
+            k = 0
             return LOSE
         new_time = pygame.time.get_ticks()
 
