@@ -20,6 +20,7 @@ clock = pygame.time.Clock()
 FPS = 25
 k = 0
 first_time = 0
+menu_time = 0
 
 
 def load_level(filename):
@@ -156,7 +157,7 @@ def start_screen():
 
 
 def start_main(new_game=False):
-    global k, first_time, new_time
+    global k, first_time, new_time, menu_time
     if new_game:
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
@@ -282,7 +283,7 @@ def start_main(new_game=False):
         player_sprite.draw(screen)
         button_group_game.update()
 
-        time = str((new_time - first_time) // 1000)
+        time = str((new_time - first_time - menu_time) // 1000)
         font_size = 100
         font = pygame.font.Font('16908.otf', font_size)
         string_rendered = font.render(time, 1, pygame.Color('black'))
@@ -295,6 +296,8 @@ def start_main(new_game=False):
 
 
 def menu():
+    global menu_time, k
+    first_time = pygame.time.get_ticks()
     running = True
     fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -343,6 +346,8 @@ def menu():
                 pos = event.pos
                 if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
                         play.coords[1] + h:
+                    if k != 0:
+                        menu_time += (last_time - first_time)
                     return GAME
                 if new_play.coords[0] <= pos[0] <= new_play.coords[0] + w and new_play.coords[1] <= pos[1] <= \
                         new_play.coords[1] + h:
@@ -357,10 +362,12 @@ def menu():
                 if table.coords[0] <= pos[0] <= table.coords[0] + w and table.coords[1] <= pos[1] <= \
                         table.coords[1] + h:
                     return RESULTS
+        last_time = pygame.time.get_ticks()
 
         clock.tick(FPS)
         button_group.update()
         pygame.display.flip()
+
     pygame.quit()
 
 
