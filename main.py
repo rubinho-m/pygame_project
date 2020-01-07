@@ -283,7 +283,10 @@ def start_main(new_game=False):
         player_sprite.draw(screen)
         button_group_game.update()
 
+
         time = str((new_time - first_time - menu_time) // 1000)
+        if int(time) < 0:
+            time = '0'
         font_size = 100
         font = pygame.font.Font('16908.otf', font_size)
         string_rendered = font.render(time, 1, pygame.Color('black'))
