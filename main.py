@@ -19,8 +19,10 @@ clock = pygame.time.Clock()
 
 FPS = 25
 k = 0
+start_k = 0
 first_time = 0
 menu_time = 0
+music_flag = True
 
 
 def load_level(filename):
@@ -117,6 +119,7 @@ def terminate():
 
 
 def start_screen():
+    global start_k
     intro_text = ["Эра динозавров", "",
                   "Вы попали в джунгли Юрского периода,",
                   "и Вам предстоит добраться до своего",
@@ -145,6 +148,11 @@ def start_screen():
         intro_rect.x = 200
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+    if start_k == 0:
+        pygame.mixer.music.load(os.path.join('sounds', 'bg_music.wav'))
+        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.play(loops=-1)
+    start_k += 1
 
     while True:
         for event in pygame.event.get():
@@ -174,11 +182,13 @@ def start_main(new_game=False):
     if new_game or k == 0:
         first_time = pygame.time.get_ticks()
     k += 1
-
+    alarm_sound = pygame.mixer.Sound(os.path.join('sounds', 'alarm.wav'))
+    scream_sound = pygame.mixer.Sound(os.path.join('sounds', 'scream.wav'))
     while running:
         for event in pygame.event.get():
             if event.type == METEORITEEVENT:
-                FireBall(random.randint(0, width), 0, (0, 1), True, meteorites_group, all_sprites)
+                FireBall(random.randint(0, width), -height, (0, 1), True, meteorites_group, all_sprites)
+                alarm_sound.play()
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEMOTION:
@@ -242,6 +252,7 @@ def start_main(new_game=False):
             player.rect.x = pos_x * 70
             player.rect.y = pos_y * 60
             k = 0
+            pygame.mixer.stop()
             return RESULTS
         if len(collide_fire) != 0:
             for fire in fire_group:
@@ -249,8 +260,11 @@ def start_main(new_game=False):
             if not player.state:
                 player.rect.x = pos_x * 70
                 player.rect.y = pos_y * 60
+                scream_sound.play()
             else:
                 k = 0
+                pygame.mixer.stop()
+                scream_sound.play()
                 return LOSE
         if len(collide_meteorite) != 0:
             for meteorite in meteorites_group:
@@ -258,13 +272,18 @@ def start_main(new_game=False):
             if not player.state:
                 player.rect.x = pos_x * 70
                 player.rect.y = pos_y * 60
+                scream_sound.play()
             else:
                 k = 0
+                pygame.mixer.stop()
+                scream_sound.play()
                 return LOSE
         if len(collide_dino) != 0:
             player.rect.x = pos_x * 70
             player.rect.y = pos_y * 60
             k = 0
+            pygame.mixer.stop()
+            scream_sound.play()
             return LOSE
         new_time = pygame.time.get_ticks()
 
@@ -283,7 +302,6 @@ def start_main(new_game=False):
         player_sprite.draw(screen)
         button_group_game.update()
 
-
         time = str((new_time - first_time - menu_time) // 1000)
         if int(time) < 0:
             time = '0'
@@ -299,7 +317,7 @@ def start_main(new_game=False):
 
 
 def menu():
-    global menu_time, k
+    global menu_time, k, music_flag
     first_time = pygame.time.get_ticks()
     running = True
     fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
@@ -312,6 +330,10 @@ def menu():
     rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
     table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
     out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
+    music = Button(button_group, (width - w, 0, w, h), screen, 'MUSIC: ON', None, True)
+    if not music_flag:
+        music.text = 'MUSIC: OFF'
+    button_group.update()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -345,6 +367,11 @@ def menu():
                     new_play.mouse_down = True
                 else:
                     new_play.mouse_down = False
+                if music.coords[0] <= pos[0] <= music.coords[0] + w and music.coords[1] <= pos[1] <= \
+                        music.coords[1] + h:
+                    music.mouse_down = True
+                else:
+                    music.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
@@ -365,7 +392,19 @@ def menu():
                 if table.coords[0] <= pos[0] <= table.coords[0] + w and table.coords[1] <= pos[1] <= \
                         table.coords[1] + h:
                     return RESULTS
+                if music.coords[0] <= pos[0] <= music.coords[0] + w and music.coords[1] <= pos[1] <= \
+                        music.coords[1] + h:
+                    if music_flag:
+                        music_flag = False
+                        music.text = 'MUSIC: OFF'
+                    else:
+                        music_flag = True
+                        music.text = 'MUSIC: ON'
         last_time = pygame.time.get_ticks()
+        if not music_flag:
+            pygame.mixer.music.set_volume(0)
+        else:
+            pygame.mixer.music.set_volume(0.4)
 
         clock.tick(FPS)
         button_group.update()
