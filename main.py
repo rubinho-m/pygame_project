@@ -23,6 +23,7 @@ start_k = 0
 first_time = 0
 menu_time = 0
 music_flag = True
+stop_game = False
 
 
 def load_level(filename):
@@ -202,6 +203,7 @@ def start_main(new_game=False):
                 pos = event.pos
                 if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
                         cancel.coords[1] + h:
+                    stop_game = True
                     return MENU
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
@@ -317,7 +319,7 @@ def start_main(new_game=False):
 
 
 def menu():
-    global menu_time, k, music_flag
+    global menu_time, k, music_flag, stop_game
     first_time = pygame.time.get_ticks()
     running = True
     fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
@@ -376,11 +378,13 @@ def menu():
                 pos = event.pos
                 if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
                         play.coords[1] + h:
-                    if k != 0:
+                    if stop_game:
                         menu_time += (last_time - first_time)
+                        stop_game = False
                     return GAME
                 if new_play.coords[0] <= pos[0] <= new_play.coords[0] + w and new_play.coords[1] <= pos[1] <= \
                         new_play.coords[1] + h:
+                    stop_game = False
                     return NEW_GAME
                 if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= \
                         rules.coords[
