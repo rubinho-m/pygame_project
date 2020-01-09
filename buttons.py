@@ -34,6 +34,14 @@ class Button(pygame.sprite.Sprite):
             x = self.coords[0] * 1.2
         if 'MUSIC' in self.text:
             x = self.coords[0] * 1.03
+        if 'NEW GAME' in self.text:
+            x = self.coords[0] * 1.33
+        if 'PLAY' in self.text or 'EXIT' in self.text:
+            x = self.coords[0] * 1.95
+        if 'RULES' in self.text:
+            x = self.coords[0] * 1.85
+        if 'LEADERS' in self.text:
+            x = self.coords[0] * 1.55
         y = self.coords[1] + self.coords[3] // 2 - self.font_size // 3.5
         self.string_rendered = self.font.render(self.text, 1, pygame.Color('black'))
         self.sc.blit(self.string_rendered, (x, y))

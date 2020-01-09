@@ -18,6 +18,8 @@ screen.fill(pygame.Color('black'))
 clock = pygame.time.Clock()
 
 FPS = 25
+lang = 'ru'
+FONT = '16908.otf'
 k = 0
 start_k = 0
 first_time = 0
@@ -120,14 +122,21 @@ def terminate():
 
 
 def start_screen():
-    global start_k
-    intro_text = ["Эра динозавров", "",
-                  "Вы попали в джунгли Юрского периода,",
-                  "и Вам предстоит добраться до своего",
-                  "реактивного самолёта, минуя динозавров",
-                  "и избегая ударов метеоритов.",
-                  'Будьте осторожны и внимательны:',
-                  'дорога таит в себе много опасностей! ']
+    global start_k, lang, menu_time, stop_game
+    if lang == 'ru':
+        intro_text = ["Эра динозавров", "",
+                      "Вы попали в джунгли Юрского периода,",
+                      "и Вам предстоит добраться до своего",
+                      "реактивного самолёта, минуя динозавров",
+                      "и избегая ударов метеоритов.",
+                      'Будьте осторожны и внимательны:',
+                      'дорога таит в себе много опасностей! ']
+    elif lang == 'eng':
+        intro_text = ["The Age of Dinosaurs", "",
+                      "You are trapped in the Jurassic jungle,",
+                      "and you have to get to your jet plane.",
+                      "Avoid dinosaurs and meteorite falling",
+                      "Be careful: the road is very dangerous."]
 
     fon = pygame.transform.scale(load_image('start_dino.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -141,6 +150,7 @@ def start_screen():
     text_coord += intro_rect.height
     screen.blit(string_rendered, intro_rect)
     text_coord = 60
+    start_time = pygame.time.get_ticks()
     for line in intro_text[1:]:
         string_rendered = font.render(line, 1, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
@@ -160,13 +170,16 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                if stop_game:
+                    menu_time += last_time - start_time
                 return MENU
         pygame.display.flip()
         clock.tick(FPS)
+        last_time = pygame.time.get_ticks()
 
 
 def start_main(new_game=False):
-    global k, first_time, new_time, menu_time
+    global k, first_time, new_time, menu_time, lang, stop_game
     if new_game:
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
@@ -177,7 +190,10 @@ def start_main(new_game=False):
     w = 70
     h = 60
     button_group_game = pygame.sprite.Group()
-    cancel = Button(button_group_game, (0, 0, w, h), screen, 'МЕНЮ', menu, True)
+    if lang == 'ru':
+        cancel = Button(button_group_game, (0, 0, w, h), screen, 'МЕНЮ', menu, True)
+    elif lang == 'eng':
+        cancel = Button(button_group_game, (0, 0, w, h), screen, 'MENU', menu, True)
     METEORITEEVENT = 30
     pygame.time.set_timer(METEORITEEVENT, 6500)
     if new_game or k == 0:
@@ -304,11 +320,13 @@ def start_main(new_game=False):
         player_sprite.draw(screen)
         button_group_game.update()
 
-        time = str((new_time - first_time - menu_time) // 1000)
+        delta = (new_time - first_time) // 1000
+
+        time = str(delta - menu_time // 1000)
         if int(time) < 0:
             time = '0'
         font_size = 100
-        font = pygame.font.Font('16908.otf', font_size)
+        font = pygame.font.Font(FONT, font_size)
         string_rendered = font.render(time, 1, pygame.Color('black'))
         screen.blit(string_rendered, (width // 2, 0))
 
@@ -319,7 +337,7 @@ def start_main(new_game=False):
 
 
 def menu():
-    global menu_time, k, music_flag, stop_game
+    global menu_time, k, music_flag, stop_game, lang
     first_time = pygame.time.get_ticks()
     running = True
     fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
@@ -327,11 +345,20 @@ def menu():
     w = 150
     h = 50
     x = 50
-    new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
-    play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
-    rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
-    table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-    out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
+    if lang == 'ru':
+        new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
+        play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
+        rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
+        table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
+        out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
+        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH', terminate)
+    elif lang == 'eng':
+        new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME', start_main, True)
+        play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
+        rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
+        table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
+        out = Button(button_group, (x, 450, w, h), screen, 'EXIT', terminate)
+        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN', terminate)
     music = Button(button_group, (width - w, 0, w, h), screen, 'MUSIC: ON', None, True)
     if not music_flag:
         music.text = 'MUSIC: OFF'
@@ -374,6 +401,11 @@ def menu():
                     music.mouse_down = True
                 else:
                     music.mouse_down = False
+                if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= pos[1] <= \
+                        language.coords[1] + h:
+                    language.mouse_down = True
+                else:
+                    language.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
@@ -389,12 +421,16 @@ def menu():
                 if rules.coords[0] <= pos[0] <= rules.coords[0] + w and rules.coords[1] <= pos[1] <= \
                         rules.coords[
                             1] + h:
+                    if stop_game:
+                        menu_time += (last_time - first_time)
                     return GREETING
                 if out.coords[0] <= pos[0] <= out.coords[0] + w and out.coords[1] <= pos[1] <= \
                         out.coords[1] + h:
                     return EXIT
                 if table.coords[0] <= pos[0] <= table.coords[0] + w and table.coords[1] <= pos[1] <= \
                         table.coords[1] + h:
+                    if stop_game:
+                        menu_time += (last_time - first_time)
                     return RESULTS
                 if music.coords[0] <= pos[0] <= music.coords[0] + w and music.coords[1] <= pos[1] <= \
                         music.coords[1] + h:
@@ -404,6 +440,28 @@ def menu():
                     else:
                         music_flag = True
                         music.text = 'MUSIC: ON'
+                if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= pos[1] <= \
+                        language.coords[1] + h:
+                    if lang == 'ru':
+                        lang = 'eng'
+                    elif lang == 'eng':
+                        lang = 'ru'
+                    if lang == 'ru':
+                        new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
+                        play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
+                        rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
+                        table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
+                        out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
+                        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH',
+                                          terminate)
+                    elif lang == 'eng':
+                        new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME', start_main, True)
+                        play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
+                        rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
+                        table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
+                        out = Button(button_group, (x, 450, w, h), screen, 'EXIT', terminate)
+                        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN',
+                                          terminate)
         last_time = pygame.time.get_ticks()
         if not music_flag:
             pygame.mixer.music.set_volume(0)
@@ -418,19 +476,26 @@ def menu():
 
 
 def finish():
+    global lang, menu_time, stop_game
     running = True
     fon = pygame.transform.scale(load_image('table.jpg'), (width, height))
     button_group_table = pygame.sprite.Group()
     screen.blit(fon, (0, 0))
     w = 150
     h = 50
-    cancel = Button(button_group_table, (0, 0, w, h), screen, 'МЕНЮ', menu)
-    x, y = 200, 0
+    if lang == 'ru':
+        cancel = Button(button_group_table, (0, 0, w, h), screen, 'МЕНЮ', menu)
+        text = 'Таблица рекордов'
+        x, y = 265, 0
+    elif lang == 'eng':
+        cancel = Button(button_group_table, (0, 0, w, h), screen, 'MENU', menu)
+        text = 'Table of records'
+        x, y = 300, 0
     font_size = 60
-    text = 'Таблица рекордов'
     font = pygame.font.Font(None, font_size)
     string_rendered = font.render(text, 1, pygame.Color('black'))
     screen.blit(string_rendered, (x, y))
+    start_time = pygame.time.get_ticks()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -446,22 +511,30 @@ def finish():
                 pos = event.pos
                 if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
                         cancel.coords[1] + h:
+                    if stop_game:
+                        menu_time += last_time - start_time
                     return MENU
         clock.tick(FPS)
         button_group_table.update()
         pygame.display.flip()
+        last_time = pygame.time.get_ticks()
     pygame.quit()
 
 
 def lose():
+    global lang
     running = True
     fon = pygame.transform.scale(load_image('game_over.png'), (width, height))
     button_group_lose = pygame.sprite.Group()
     screen.blit(fon, (0, 0))
     w = 150
     h = 50
-    cancel = Button(button_group_lose, (0, 0, w, h), screen, 'МЕНЮ', menu)
-    results = Button(button_group_lose, (width - w, 0, w, h), screen, 'ЛИДЕРЫ', finish)
+    if lang == 'ru':
+        cancel = Button(button_group_lose, (0, 0, w, h), screen, 'МЕНЮ', menu)
+        results = Button(button_group_lose, (width - w, 0, w, h), screen, 'ЛИДЕРЫ', finish)
+    elif lang == 'eng':
+        cancel = Button(button_group_lose, (0, 0, w, h), screen, 'MENU', menu)
+        results = Button(button_group_lose, (width - w, 0, w, h), screen, 'LEADERS', finish)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
