@@ -10,6 +10,8 @@ from buttons import Button
 from Plane_class import Plane
 from Dino_class import Dino
 from FireBall_class import FireBall
+import sqlite3
+from input_text import input_text
 
 pygame.init()
 size = (width, height) = 840, 600
@@ -20,13 +22,20 @@ clock = pygame.time.Clock()
 FPS = 25
 lang = 'ru'
 FONT = '16908.otf'
+DB_LEADERS = 'leaders.db'
 k = 0
 start_k = 0
 first_time = 0
 menu_time = 0
 music_flag = True
 stop_game = False
+levels = ['first.txt', 'second.txt', 'third.txt']
 
+
+# def load_db(filename):
+#
+#
+#     return cur, bd[:10]
 
 def load_level(filename):
     filename = "levels/" + filename
@@ -204,20 +213,23 @@ def start_main(new_game=False):
     while running:
         for event in pygame.event.get():
             if event.type == METEORITEEVENT:
-                FireBall(random.randint(0, width), -height, (0, 1), True, meteorites_group, all_sprites)
+                FireBall(random.randint(0, width), -height, (0, 1), True, meteorites_group,
+                         all_sprites)
                 alarm_sound.play()
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
                     cancel.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     stop_game = True
                     return MENU
@@ -271,6 +283,28 @@ def start_main(new_game=False):
             player.rect.y = pos_y * 60
             k = 0
             pygame.mixer.stop()
+
+            con = sqlite3.connect(DB_LEADERS)
+            cur = con.cursor()
+
+            bd = cur.execute('SELECT * from players ORDER BY time').fetchall()
+
+            cur.execute('DELETE from players')
+
+            for name, t in bd:
+                cur.execute(f"""INSERT INTO players(name, time) VALUES ({', '.join(
+                    ["'" + str(x) + "'" for x in [name, t]])})""")
+
+            bd = bd[:10]
+
+            if len(bd) < 10 or time < bd[-1][-1]:
+                name = input_text()
+                cur.execute(f"""INSERT INTO players(name, time) VALUES({', '.join(
+                        ["'" + str(x) + "'" for x in [name, time]])})""")
+
+            con.commit()
+            con.close()
+
             return RESULTS
         if len(collide_fire) != 0:
             for fire in fire_group:
@@ -353,7 +387,8 @@ def menu():
         rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
         table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
         out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
-        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH', terminate)
+        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH',
+                          terminate)
         title = 'ЭРА ДИНОЗАВРОВ'
     elif lang == 'eng':
         new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME', start_main, True)
@@ -361,7 +396,8 @@ def menu():
         rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
         table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
         out = Button(button_group, (x, 450, w, h), screen, 'EXIT', terminate)
-        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN', terminate)
+        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN',
+                          terminate)
         title = 'THE AGE OF DINOSAURS'
     string_rendered = font.render(title, True, pygame.Color('black'))
     music = Button(button_group, (width - w, 0, w, h), screen, 'MUSIC: ON', None, True)
@@ -396,7 +432,8 @@ def menu():
                     out.mouse_down = True
                 else:
                     out.mouse_down = False
-                if new_play.coords[0] <= pos[0] <= new_play.coords[0] + w and new_play.coords[1] <= pos[1] <= \
+                if new_play.coords[0] <= pos[0] <= new_play.coords[0] + w and new_play.coords[1] <= \
+                        pos[1] <= \
                         new_play.coords[1] + h:
                     new_play.mouse_down = True
                 else:
@@ -406,7 +443,8 @@ def menu():
                     music.mouse_down = True
                 else:
                     music.mouse_down = False
-                if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= pos[1] <= \
+                if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= \
+                        pos[1] <= \
                         language.coords[1] + h:
                     language.mouse_down = True
                 else:
@@ -419,7 +457,8 @@ def menu():
                         menu_time += (last_time - first_time)
                         stop_game = False
                     return GAME
-                if new_play.coords[0] <= pos[0] <= new_play.coords[0] + w and new_play.coords[1] <= pos[1] <= \
+                if new_play.coords[0] <= pos[0] <= new_play.coords[0] + w and new_play.coords[1] <= \
+                        pos[1] <= \
                         new_play.coords[1] + h:
                     stop_game = False
                     return NEW_GAME
@@ -445,28 +484,33 @@ def menu():
                     else:
                         music_flag = True
                         music.text = 'MUSIC: ON'
-                if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= pos[1] <= \
+                if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= \
+                        pos[1] <= \
                         language.coords[1] + h:
                     if lang == 'ru':
                         lang = 'eng'
                     elif lang == 'eng':
                         lang = 'ru'
                     if lang == 'ru':
-                        new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
+                        new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА',
+                                          start_main, True)
                         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
                         out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
-                        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH',
+                        language = Button(button_group, (width - w - 10, height - h - 10, w, h),
+                                          screen, 'ENGLISH',
                                           terminate)
                         title = 'ЭРА ДИНОЗАВРОВ'
                     elif lang == 'eng':
-                        new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME', start_main, True)
+                        new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME',
+                                          start_main, True)
                         play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
                         out = Button(button_group, (x, 450, w, h), screen, 'EXIT', terminate)
-                        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN',
+                        language = Button(button_group, (width - w - 10, height - h - 10, w, h),
+                                          screen, 'RUSSIAN',
                                           terminate)
                         title = 'THE AGE OF DINOSAURS'
                     string_rendered = font.render(title, True, pygame.Color('black'))
@@ -507,20 +551,46 @@ def finish():
     string_rendered = font.render(text, 1, pygame.Color('black'))
     screen.blit(string_rendered, (x, y))
     start_time = pygame.time.get_ticks()
+
+    con = sqlite3.connect(DB_LEADERS)
+    cur = con.cursor()
+
+    bd = cur.execute('SELECT * from players ORDER BY time').fetchall()[:10]
+
+    font_size = 40
+    font = pygame.font.Font(None, font_size)
+    x, y = 100, 100
+
+    for name, time in bd:
+        name_r = font.render(name, 1, pygame.Color('black'))
+        time_r = font.render(str(time), 1, pygame.Color('black'))
+
+        screen.blit(name_r, (x, y))
+        screen.blit(time_r, (x + 600, y))
+        y += 40
+
+    x, y = 90, 90
+    for _ in range(10):
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, 600, 40), 1)
+        pygame.draw.rect(screen, (0, 0, 0), (x + 600, y, 80, 40), 1)
+        y += 40
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
                     cancel.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     if stop_game:
                         menu_time += last_time - start_time
@@ -552,22 +622,26 @@ def lose():
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
                     cancel.mouse_down = False
-                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[1] <= \
+                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[
+                    1] <= \
                         results.coords[1] + h:
                     results.mouse_down = True
                 else:
                     results.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     return MENU
-                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[1] <= \
+                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[
+                    1] <= \
                         results.coords[1] + h:
                     return RESULTS
         clock.tick(FPS)
@@ -608,7 +682,7 @@ todo = {GREETING: start_screen,
         LOSE: lose,
         NEW_GAME: lambda: start_main(True)}
 
-player, pos_x, pos_y, plane = generate_level(load_level('first.txt'))
+player, pos_x, pos_y, plane = generate_level(load_level(random.choice(levels)))
 state = GREETING
 while True:
     state = todo[state]()
