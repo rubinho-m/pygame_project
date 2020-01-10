@@ -29,7 +29,7 @@ first_time = 0
 menu_time = 0
 music_flag = True
 stop_game = False
-levels = ['first.txt', 'second.txt', 'third.txt']
+levels = ['first.txt', 'second.txt', 'third.txt', 'fourth.txt']
 
 
 # def load_db(filename):
