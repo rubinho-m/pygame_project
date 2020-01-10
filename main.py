@@ -26,7 +26,7 @@ first_time = 0
 menu_time = 0
 music_flag = True
 stop_game = False
-
+die = False
 
 def load_level(filename):
     filename = "levels/" + filename
@@ -179,8 +179,9 @@ def start_screen():
 
 
 def start_main(new_game=False):
-    global k, first_time, new_time, menu_time, lang, stop_game
-    if new_game:
+    global k, first_time, new_time, menu_time, lang, stop_game, die
+    if new_game or die:
+        die = False
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
     player.rect.w = player.player_scale
@@ -533,8 +534,9 @@ def finish():
 
 
 def lose():
-    global lang
+    global lang, die
     running = True
+    die = True
     fon = pygame.transform.scale(load_image('game_over.png'), (width, height))
     button_group_lose = pygame.sprite.Group()
     screen.blit(fon, (0, 0))
