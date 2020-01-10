@@ -36,6 +36,7 @@ levels = ['first.txt', 'second.txt', 'third.txt']
 #
 #
 #     return cur, bd[:10]
+die = False
 
 def load_level(filename):
     filename = "levels/" + filename
@@ -188,8 +189,9 @@ def start_screen():
 
 
 def start_main(new_game=False):
-    global k, first_time, new_time, menu_time, lang, stop_game
-    if new_game:
+    global k, first_time, new_time, menu_time, lang, stop_game, die
+    if new_game or die:
+        die = False
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
     player.rect.w = player.player_scale
@@ -603,8 +605,9 @@ def finish():
 
 
 def lose():
-    global lang
+    global lang, die
     running = True
+    die = True
     fon = pygame.transform.scale(load_image('game_over.png'), (width, height))
     button_group_lose = pygame.sprite.Group()
     screen.blit(fon, (0, 0))
@@ -622,26 +625,22 @@ def lose():
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
-                    1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
                     cancel.mouse_down = False
-                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[
-                    1] <= \
+                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[1] <= \
                         results.coords[1] + h:
                     results.mouse_down = True
                 else:
                     results.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
-                    1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
                         cancel.coords[1] + h:
                     return MENU
-                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[
-                    1] <= \
+                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[1] <= \
                         results.coords[1] + h:
                     return RESULTS
         clock.tick(FPS)
