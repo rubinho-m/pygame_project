@@ -2,6 +2,7 @@ import os
 import pygame
 import math
 
+
 class Button(pygame.sprite.Sprite):
 
     def __init__(self, group, coords, sc, text, func, left=False):
@@ -15,7 +16,7 @@ class Button(pygame.sprite.Sprite):
         self.color = (151, 176, 223)
         self.down_color = (223, 105, 148)
         self.font_size = 30
-        self.font = pygame.font.Font(None, self.font_size)
+        self.font = pygame.font.Font('18337.otf', self.font_size)
         self.string_rendered = self.font.render(self.text, 1, pygame.Color('black'))
         self.left = left
 
@@ -42,6 +43,6 @@ class Button(pygame.sprite.Sprite):
             x = self.coords[0] * 1.85
         if 'LEADERS' in self.text:
             x = self.coords[0] * 1.55
-        y = self.coords[1] + self.coords[3] // 2 - self.font_size // 3.5
+        y = self.coords[1] + self.coords[3] // 2 - self.font_size // 2
         self.string_rendered = self.font.render(self.text, 1, pygame.Color('black'))
         self.sc.blit(self.string_rendered, (x, y))

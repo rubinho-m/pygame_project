@@ -31,12 +31,12 @@ music_flag = True
 stop_game = False
 levels = ['first.txt', 'second.txt', 'third.txt', 'fourth.txt']
 
-
 # def load_db(filename):
 #
 #
 #     return cur, bd[:10]
 die = False
+
 
 def load_level(filename):
     filename = "levels/" + filename
@@ -192,6 +192,7 @@ def start_main(new_game=False):
     global k, first_time, new_time, menu_time, lang, stop_game, die
     if new_game or die:
         die = False
+        menu_time = 0
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
     player.rect.w = player.player_scale
@@ -302,7 +303,7 @@ def start_main(new_game=False):
             if len(bd) < 10 or time < bd[-1][-1]:
                 name = input_text()
                 cur.execute(f"""INSERT INTO players(name, time) VALUES({', '.join(
-                        ["'" + str(x) + "'" for x in [name, time]])})""")
+                    ["'" + str(x) + "'" for x in [name, time]])})""")
 
             con.commit()
             con.close()
@@ -388,7 +389,8 @@ def menu():
         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
         rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
         table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-        out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
+        out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
+        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ', choose_level)
         language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH',
                           terminate)
         title = 'ЭРА ДИНОЗАВРОВ'
@@ -397,7 +399,8 @@ def menu():
         play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
         rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
         table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
-        out = Button(button_group, (x, 450, w, h), screen, 'EXIT', terminate)
+        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS', choose_level)
+        out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
         language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN',
                           terminate)
         title = 'THE AGE OF DINOSAURS'
@@ -451,6 +454,12 @@ def menu():
                     language.mouse_down = True
                 else:
                     language.mouse_down = False
+                if level_b.coords[0] <= pos[0] <= level_b.coords[0] + w and level_b.coords[1] <= \
+                        pos[1] <= \
+                        level_b.coords[1] + h:
+                    level_b.mouse_down = True
+                else:
+                    level_b.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 if play.coords[0] <= pos[0] <= play.coords[0] + w and play.coords[1] <= pos[1] <= \
@@ -486,6 +495,12 @@ def menu():
                     else:
                         music_flag = True
                         music.text = 'MUSIC: ON'
+
+                if level_b.coords[0] <= pos[0] <= level_b.coords[0] + w and level_b.coords[1] <= pos[1] <= \
+                        level_b.coords[1] + h:
+                    if stop_game:
+                        menu_time += (last_time - first_time)
+                    return LEVELS
                 if language.coords[0] <= pos[0] <= language.coords[0] + w and language.coords[1] <= \
                         pos[1] <= \
                         language.coords[1] + h:
@@ -499,7 +514,8 @@ def menu():
                         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-                        out = Button(button_group, (x, 450, w, h), screen, 'ВЫХОД', terminate)
+                        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ', choose_level)
+                        out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
                         language = Button(button_group, (width - w - 10, height - h - 10, w, h),
                                           screen, 'ENGLISH',
                                           terminate)
@@ -510,7 +526,8 @@ def menu():
                         play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
-                        out = Button(button_group, (x, 450, w, h), screen, 'EXIT', terminate)
+                        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS', choose_level)
+                        out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
                         language = Button(button_group, (width - w - 10, height - h - 10, w, h),
                                           screen, 'RUSSIAN',
                                           terminate)
@@ -649,6 +666,72 @@ def lose():
     pygame.quit()
 
 
+def choose_level():
+    global lang, menu_time, stop_game
+    running = True
+    fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
+    button_group_choose = pygame.sprite.Group()
+    screen.blit(fon, (0, 0))
+    w = 150
+    h = 50
+    start_time = pygame.time.get_ticks()
+    if lang == 'ru':
+        cancel = Button(button_group_choose, (0, 0, w, h), screen, 'МЕНЮ', menu)
+        first = Button(button_group_choose, (50, 80, w, h), screen, 'ПЕРВЫЙ', menu)
+        second = Button(button_group_choose, (50, 180, w, h), screen, 'ВТОРОЙ', menu)
+        third = Button(button_group_choose, (50, 280, w, h), screen, 'ТРЕТИЙ', menu)
+        fourth = Button(button_group_choose, (50, 380, w, h), screen, 'ЧЕТВЕРТЫЙ', menu, True)
+    elif lang == 'eng':
+        cancel = Button(button_group_choose, (0, 0, w, h), screen, 'MENU', menu)
+        first = Button(button_group_choose, (50, 80, w, h), screen, 'FIRST', menu)
+        second = Button(button_group_choose, (50, 180, w, h), screen, 'SECOND', menu)
+        third = Button(button_group_choose, (50, 280, w, h), screen, 'THIRD', menu)
+        fourth = Button(button_group_choose, (50, 380, w, h), screen, 'FOURTH', menu)
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEMOTION:
+                pos = event.pos
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                        cancel.coords[1] + h:
+                    cancel.mouse_down = True
+                else:
+                    cancel.mouse_down = False
+                if first.coords[0] <= pos[0] <= first.coords[0] + w and first.coords[1] <= pos[1] <= \
+                        first.coords[1] + h:
+                    first.mouse_down = True
+                else:
+                    first.mouse_down = False
+                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[1] <= \
+                        second.coords[1] + h:
+                    second.mouse_down = True
+                else:
+                    second.mouse_down = False
+                if third.coords[0] <= pos[0] <= third.coords[0] + w and third.coords[1] <= pos[1] <= \
+                        third.coords[1] + h:
+                    third.mouse_down = True
+                else:
+                    third.mouse_down = False
+                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[1] <= \
+                        fourth.coords[1] + h:
+                    fourth.mouse_down = True
+                else:
+                    fourth.mouse_down = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                        cancel.coords[1] + h:
+                    if stop_game:
+                        menu_time += last_time - start_time
+                    return MENU
+        clock.tick(FPS)
+        button_group_choose.update()
+        pygame.display.flip()
+        last_time = pygame.time.get_ticks()
+    pygame.quit()
+
+
 tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg'),
                'plane': load_image('plane.png', -1)}
 
@@ -672,6 +755,7 @@ RESULTS = 3
 EXIT = 4
 LOSE = 5
 NEW_GAME = 6
+LEVELS = 7
 
 todo = {GREETING: start_screen,
         MENU: menu,
@@ -679,7 +763,8 @@ todo = {GREETING: start_screen,
         RESULTS: finish,
         EXIT: terminate,
         LOSE: lose,
-        NEW_GAME: lambda: start_main(True)}
+        NEW_GAME: lambda: start_main(True),
+        LEVELS: choose_level}
 
 player, pos_x, pos_y, plane = generate_level(load_level(random.choice(levels)))
 state = GREETING
