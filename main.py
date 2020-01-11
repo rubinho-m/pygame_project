@@ -29,14 +29,9 @@ first_time = 0
 menu_time = 0
 music_flag = True
 stop_game = False
-levels = ['first.txt', 'second.txt', 'third.txt', 'fourth.txt']
-
-
-# def load_db(filename):
-#
-#
-#     return cur, bd[:10]
+levels = ['first.txt', 'second.txt', 'third.txt', 'fourth.txt', 'fifth.txt']
 die = False
+
 
 def load_level(filename):
     filename = "levels/" + filename
@@ -189,11 +184,28 @@ def start_screen():
 
 
 def start_main(new_game=False):
-    global k, first_time, new_time, menu_time, lang, stop_game, die
-    if new_game or die:
+    global k, first_time, new_time, menu_time, lang, stop_game, die, player, pos_x, pos_y
+    if die:
         die = False
         player.rect.x = pos_x * 70
         player.rect.y = pos_y * 60
+
+    if new_game:
+
+        all_sprites.empty()
+        player_sprite.empty()
+        volcano_group.empty()
+        plane_group.empty()
+        dino_group.empty()
+        fire_group.empty()
+        meteorites_group.empty()
+
+        player, pos_x, pos_y, plane = generate_level(load_level(random.choice(levels)))
+
+        die = False
+        player.rect.x = pos_x * 70
+        player.rect.y = pos_y * 60
+
     player.rect.w = player.player_scale
     player.rect.h = player.player_scale
     step = 5
@@ -302,7 +314,7 @@ def start_main(new_game=False):
             if len(bd) < 10 or time < bd[-1][-1]:
                 name = input_text()
                 cur.execute(f"""INSERT INTO players(name, time) VALUES({', '.join(
-                        ["'" + str(x) + "'" for x in [name, time]])})""")
+                    ["'" + str(x) + "'" for x in [name, time]])})""")
 
             con.commit()
             con.close()
@@ -625,22 +637,26 @@ def lose():
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
                     cancel.mouse_down = False
-                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[1] <= \
+                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[
+                    1] <= \
                         results.coords[1] + h:
                     results.mouse_down = True
                 else:
                     results.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     return MENU
-                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[1] <= \
+                if results.coords[0] <= pos[0] <= results.coords[0] + w and results.coords[1] <= pos[
+                    1] <= \
                         results.coords[1] + h:
                     return RESULTS
         clock.tick(FPS)
