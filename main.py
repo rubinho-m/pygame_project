@@ -270,14 +270,14 @@ def start_main(new_game=False, level=None):
                     stop_game = True
                     return MENU
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             player.rotate = False
             player.rect.x += step
             player_sprite.update()
             collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
             if len(collide) != 0:
                 player.rect.x -= step
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             player.rotate = True
             player.rect.x -= step
             player_sprite.update()
@@ -286,20 +286,21 @@ def start_main(new_game=False, level=None):
             if len(collide) != 0:
                 player.rect.x += step
 
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
             player.rect.y -= step
             player_sprite.update()
             collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
             if len(collide) != 0:
                 player.rect.y += step
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             player.rect.y += step
             player_sprite.update()
             collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
             if len(collide) != 0:
                 player.rect.y -= step
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not \
-                keys[pygame.K_RIGHT]:
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[
+            pygame.K_RIGHT] and not keys[pygame.K_RIGHT] and not keys[pygame.K_d] and not keys[pygame.K_a] and not keys[
+            pygame.K_w] and not keys[pygame.K_s]:
             player.state = False
         else:
             player.state = True
