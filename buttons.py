@@ -43,6 +43,10 @@ class Button(pygame.sprite.Sprite):
             x = self.coords[0] * 1.85
         if 'LEADERS' in self.text:
             x = self.coords[0] * 1.55
+        if 'FIRST' in self.text or 'THIRD' in self.text or 'FIFTH' in self.text:
+            x = self.coords[0] * 1.85
+        if self.text == 'SECOND':
+            x = self.coords[0] * 1.5
         y = self.coords[1] + self.coords[3] // 2 - self.font_size // 2
         self.string_rendered = self.font.render(self.text, 1, pygame.Color('black'))
         self.sc.blit(self.string_rendered, (x, y))

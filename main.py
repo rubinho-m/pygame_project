@@ -29,16 +29,16 @@ first_time = 0
 menu_time = 0
 music_flag = True
 stop_game = False
-<<<<<<< HEAD
+
 levels = ['first.txt', 'second.txt', 'third.txt', 'fourth.txt']
 
 # def load_db(filename):
 #
 #
 #     return cur, bd[:10]
-=======
+
 levels = ['first.txt', 'second.txt', 'third.txt', 'fourth.txt', 'fifth.txt']
->>>>>>> 0d586bc54feec6dd15ced6c346b0f47ad8a15a31
+
 die = False
 
 
@@ -192,7 +192,7 @@ def start_screen():
         last_time = pygame.time.get_ticks()
 
 
-def start_main(new_game=False):
+def start_main(new_game=False, level=None):
     global k, first_time, new_time, menu_time, lang, stop_game, die, player, pos_x, pos_y
     if die:
         die = False
@@ -201,7 +201,7 @@ def start_main(new_game=False):
         player.rect.y = pos_y * 60
 
     if new_game:
-
+        menu_time = 0
         all_sprites.empty()
         player_sprite.empty()
         volcano_group.empty()
@@ -210,7 +210,19 @@ def start_main(new_game=False):
         fire_group.empty()
         meteorites_group.empty()
 
-        player, pos_x, pos_y, plane = generate_level(load_level(random.choice(levels)))
+        if level is None:
+
+            player, pos_x, pos_y, plane = generate_level(load_level(random.choice(levels)))
+        elif level == 1:
+            player, pos_x, pos_y, plane = generate_level(load_level('first.txt'))
+        elif level == 2:
+            player, pos_x, pos_y, plane = generate_level(load_level('second.txt'))
+        elif level == 3:
+            player, pos_x, pos_y, plane = generate_level(load_level('third.txt'))
+        elif level == 4:
+            player, pos_x, pos_y, plane = generate_level(load_level('fourth.txt'))
+        elif level == 5:
+            player, pos_x, pos_y, plane = generate_level(load_level('fifth.txt'))
 
         die = False
         player.rect.x = pos_x * 70
@@ -656,7 +668,7 @@ def lose():
         results = Button(button_group_lose, (width - w, 0, w, h), screen, 'ЛИДЕРЫ', finish)
     elif lang == 'eng':
         cancel = Button(button_group_lose, (0, 0, w, h), screen, 'MENU', menu)
-        results = Button(button_group_lose, (width - w, 0, w, h), screen, 'LEADERS', finish)
+        results = Button(button_group_lose, (width - w, 0, w, h), screen, 'RECORDS', finish)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -706,12 +718,14 @@ def choose_level():
         second = Button(button_group_choose, (50, 180, w, h), screen, 'ВТОРОЙ', menu)
         third = Button(button_group_choose, (50, 280, w, h), screen, 'ТРЕТИЙ', menu)
         fourth = Button(button_group_choose, (50, 380, w, h), screen, 'ЧЕТВЕРТЫЙ', menu, True)
+        fifth = Button(button_group_choose, (50, 480, w, h), screen, 'ПЯТЫЙ', menu)
     elif lang == 'eng':
         cancel = Button(button_group_choose, (0, 0, w, h), screen, 'MENU', menu)
         first = Button(button_group_choose, (50, 80, w, h), screen, 'FIRST', menu)
         second = Button(button_group_choose, (50, 180, w, h), screen, 'SECOND', menu)
         third = Button(button_group_choose, (50, 280, w, h), screen, 'THIRD', menu)
         fourth = Button(button_group_choose, (50, 380, w, h), screen, 'FOURTH', menu)
+        fifth = Button(button_group_choose, (50, 480, w, h), screen, 'FIFTH', menu)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -743,6 +757,11 @@ def choose_level():
                     fourth.mouse_down = True
                 else:
                     fourth.mouse_down = False
+                if fifth.coords[0] <= pos[0] <= fifth.coords[0] + w and fifth.coords[1] <= pos[1] <= \
+                        fifth.coords[1] + h:
+                    fifth.mouse_down = True
+                else:
+                    fifth.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
                 if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
@@ -750,6 +769,21 @@ def choose_level():
                     if stop_game:
                         menu_time += last_time - start_time
                     return MENU
+                if first.coords[0] <= pos[0] <= first.coords[0] + w and first.coords[1] <= pos[1] <= \
+                        first.coords[1] + h:
+                    return FIRST
+                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[1] <= \
+                        second.coords[1] + h:
+                    return SECOND
+                if third.coords[0] <= pos[0] <= third.coords[0] + w and third.coords[1] <= pos[1] <= \
+                        third.coords[1] + h:
+                    return THIRD
+                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[1] <= \
+                        fourth.coords[1] + h:
+                    return FOURTH
+                if fifth.coords[0] <= pos[0] <= fifth.coords[0] + w and fifth.coords[1] <= pos[1] <= \
+                        fifth.coords[1] + h:
+                    return FIFTH
         clock.tick(FPS)
         button_group_choose.update()
         pygame.display.flip()
@@ -781,6 +815,11 @@ EXIT = 4
 LOSE = 5
 NEW_GAME = 6
 LEVELS = 7
+FIRST = 8
+SECOND = 9
+THIRD = 10
+FOURTH = 11
+FIFTH = 12
 
 todo = {GREETING: start_screen,
         MENU: menu,
@@ -789,7 +828,12 @@ todo = {GREETING: start_screen,
         EXIT: terminate,
         LOSE: lose,
         NEW_GAME: lambda: start_main(True),
-        LEVELS: choose_level}
+        LEVELS: choose_level,
+        FIRST: lambda: start_main(True, 1),
+        SECOND: lambda: start_main(True, 2),
+        THIRD: lambda: start_main(True, 3),
+        FOURTH: lambda: start_main(True, 4),
+        FIFTH: lambda: start_main(True, 5)}
 
 player, pos_x, pos_y, plane = generate_level(load_level(random.choice(levels)))
 state = GREETING
