@@ -7,9 +7,15 @@ def input_text():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     running = True
+
+    font_s = 40
+    font_head = pygame.font.Font(None, font_s)
+
+    line = font_head.render('ВВЕДИТЕ СВОЁ ИМЯ:', 1, pygame.Color('black'))
+
     ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
     text = ''
-    font_size = 30
+    font_size = 40
     font = pygame.font.Font(None, font_size)
     string_rendered = font.render(text, 1, pygame.Color('black'))
     x = WIDTH // 2 - 50
@@ -34,6 +40,9 @@ def input_text():
                     string_rendered = font.render(text, 1, pygame.Color('black'))
         screen.fill(pygame.Color("yellow"))
         screen.blit(string_rendered, (x, y))
+
+        screen.blit(line, (WIDTH // 2 - 150, 50))
+
         pygame.display.flip()
         clock.tick(FPS)
 
