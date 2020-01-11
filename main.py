@@ -148,7 +148,8 @@ def start_screen():
                       'игрок будет перемещён в стартовую точку.',
                       'Метеориты будут пролетать с периодичностью в 7с.',
                       'Будьте осторожны и внимательны:',
-                      'дорога таит в себе много опасностей... Удачи! ']
+                      'дорога таит в себе много опасностей... Удачи!',
+                      'Нажмите любую кнопку, чтобы продолжить.']
     elif lang == 'eng':
         intro_text = ["The Age of Dinosaurs", "",
                       "You are trapped in the Jurassic jungle,",
@@ -159,7 +160,8 @@ def start_screen():
                       'the player will be moved to the starting point.',
                       'Meteorites will fly in 7 seconds.',
                       "Be careful: the road is very",
-                      "dangerous... Good luck!"]
+                      "dangerous... Good luck!",
+                      'Push any button to continue.']
 
     fon = pygame.transform.scale(load_image('start_dino.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -307,8 +309,11 @@ def start_main(new_game=False, level=None):
             collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
             if len(collide) != 0:
                 player.rect.y -= step
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[
-            pygame.K_RIGHT] and not keys[pygame.K_RIGHT] and not keys[pygame.K_d] and not keys[pygame.K_a] and not keys[
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not \
+                keys[
+                    pygame.K_RIGHT] and not keys[pygame.K_RIGHT] and not keys[pygame.K_d] and not \
+                keys[
+                    pygame.K_a] and not keys[
             pygame.K_w] and not keys[pygame.K_s]:
             player.state = False
         else:
@@ -539,7 +544,8 @@ def menu():
                         music_flag = True
                         music.text = 'MUSIC: ON'
 
-                if level_b.coords[0] <= pos[0] <= level_b.coords[0] + w and level_b.coords[1] <= pos[1] <= \
+                if level_b.coords[0] <= pos[0] <= level_b.coords[0] + w and level_b.coords[1] <= pos[
+                    1] <= \
                         level_b.coords[1] + h:
                     if stop_game:
                         menu_time += (last_time - first_time)
@@ -557,7 +563,8 @@ def menu():
                         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-                        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ', choose_level)
+                        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ',
+                                         choose_level)
                         out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
                         language = Button(button_group, (width - w - 10, height - h - 10, w, h),
                                           screen, 'ENGLISH',
@@ -569,7 +576,8 @@ def menu():
                         play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
-                        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS', choose_level)
+                        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS',
+                                         choose_level)
                         out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
                         language = Button(button_group, (width - w - 10, height - h - 10, w, h),
                                           screen, 'RUSSIAN',
@@ -742,7 +750,8 @@ def choose_level():
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
@@ -752,7 +761,8 @@ def choose_level():
                     first.mouse_down = True
                 else:
                     first.mouse_down = False
-                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[1] <= \
+                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[
+                    1] <= \
                         second.coords[1] + h:
                     second.mouse_down = True
                 else:
@@ -762,7 +772,8 @@ def choose_level():
                     third.mouse_down = True
                 else:
                     third.mouse_down = False
-                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[1] <= \
+                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[
+                    1] <= \
                         fourth.coords[1] + h:
                     fourth.mouse_down = True
                 else:
@@ -774,7 +785,8 @@ def choose_level():
                     fifth.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     if stop_game:
                         menu_time += last_time - start_time
@@ -782,13 +794,15 @@ def choose_level():
                 if first.coords[0] <= pos[0] <= first.coords[0] + w and first.coords[1] <= pos[1] <= \
                         first.coords[1] + h:
                     return FIRST
-                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[1] <= \
+                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[
+                    1] <= \
                         second.coords[1] + h:
                     return SECOND
                 if third.coords[0] <= pos[0] <= third.coords[0] + w and third.coords[1] <= pos[1] <= \
                         third.coords[1] + h:
                     return THIRD
-                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[1] <= \
+                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[
+                    1] <= \
                         fourth.coords[1] + h:
                     return FOURTH
                 if fifth.coords[0] <= pos[0] <= fifth.coords[0] + w and fifth.coords[1] <= pos[1] <= \

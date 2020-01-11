@@ -24,7 +24,8 @@ class Board:
         top = self.top
         for i in range(self.width):
             for j in range(self.height):
-                pygame.draw.rect(screen, pygame.Color('white'), (left, top, self.cell_size, self.cell_size), 1)
+                pygame.draw.rect(screen, pygame.Color('white'),
+                                 (left, top, self.cell_size, self.cell_size), 1)
                 if self.board[j][i] == 1:
                     pygame.draw.line(screen, pygame.Color('blue'), (left, top),
                                      (left + self.cell_size, top + self.cell_size))

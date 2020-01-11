@@ -1,4 +1,3 @@
-import os
 import pygame
 import math
 
@@ -26,7 +25,8 @@ class Button(pygame.sprite.Sprite):
         else:
             pygame.draw.rect(self.sc, self.down_color, self.coords)
         if self.text == 'ПРАВИЛА' or self.text == 'ЛИДЕРЫ':
-            x = self.coords[0] + self.coords[2] // 2 - (math.floor((len(self.text) // 2)) * self.font_size) // 2
+            x = self.coords[0] + self.coords[2] // 2 - (
+                    math.floor((len(self.text) // 2)) * self.font_size) // 2
         elif self.text == 'ИГРАТЬ':
             x = self.coords[0] + self.coords[2] // 2 - self.coords[2] // 4
         else:
