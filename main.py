@@ -427,11 +427,17 @@ def menu():
     running = True
     fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
     screen.blit(fon, (0, 0))
+
+    font_rules = pygame.font.Font(None, 30)
+    xx, yy = 400, 200
+
     w = 150
     h = 50
     x = 50
+
     font_size = 60
     font = pygame.font.Font(FONT, font_size)
+
     if lang == 'ru':
         new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
@@ -592,6 +598,17 @@ def menu():
         screen.fill(pygame.Color('black'))
         screen.blit(fon, (0, 0))
         screen.blit(string_rendered, (275, 0))
+
+        if lang == 'ru':
+            lines = ['Управление осуществляется стрелками', 'или клавишами WASD']
+        elif lang == 'eng':
+            lines = ['Control is carried out by arrows', 'or keys WASD']
+
+        for line in lines:
+            line = font_rules.render(line, 1, (0, 0, 0))
+            screen.blit(line, (xx, yy))
+            yy += 20
+        xx, yy = 400, 200
 
         clock.tick(FPS)
         button_group.update()
