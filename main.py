@@ -143,14 +143,23 @@ def start_screen():
                       "и Вам предстоит добраться до своего",
                       "реактивного самолёта, минуя динозавров",
                       "и избегая ударов метеоритов.",
+                      'Вы можете прятаться в стоге сена,',
+                      'но при попадании в него огненного шара',
+                      'игрок будет перемещён в стартовую точку.',
+                      'Метеориты будут пролетать с периодичностью в 7с.',
                       'Будьте осторожны и внимательны:',
-                      'дорога таит в себе много опасностей! ']
+                      'дорога таит в себе много опасностей... Удачи! ']
     elif lang == 'eng':
         intro_text = ["The Age of Dinosaurs", "",
                       "You are trapped in the Jurassic jungle,",
                       "and you have to get to your jet plane.",
-                      "Avoid dinosaurs and meteorite falling",
-                      "Be careful: the road is very dangerous."]
+                      "Avoid dinosaurs and meteorite falling.",
+                      'You can hide in a haystack,',
+                      'but when a fireball hits it',
+                      'the player will be moved to the starting point.',
+                      'Meteorites will fly in 7 seconds.',
+                      "Be careful: the road is very",
+                      "dangerous... Good luck!"]
 
     fon = pygame.transform.scale(load_image('start_dino.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -158,12 +167,12 @@ def start_screen():
     line = intro_text[0]
     string_rendered = font.render(line, 6, pygame.Color('black'))
     intro_rect = string_rendered.get_rect()
-    text_coord = 50
+    text_coord = 20
     intro_rect.top = text_coord
     intro_rect.x = 310
     text_coord += intro_rect.height
     screen.blit(string_rendered, intro_rect)
-    text_coord = 60
+    text_coord = 20
     start_time = pygame.time.get_ticks()
     for line in intro_text[1:]:
         string_rendered = font.render(line, 1, pygame.Color('black'))
@@ -334,7 +343,7 @@ def start_main(new_game=False, level=None):
 
             bd = bd[:10]
 
-            if len(bd) < 10 or time < bd[-1][-1]:
+            if len(bd) < 10 or int(time) < bd[-1][-1]:
                 name = input_text()
                 cur.execute(f"""INSERT INTO players(name, time) VALUES({', '.join(
                     ["'" + str(x) + "'" for x in [name, time]])})""")
