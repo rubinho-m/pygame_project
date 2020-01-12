@@ -1,5 +1,6 @@
 import pygame
 
+
 def input_text():
     FPS = 30
     WIDTH = 840

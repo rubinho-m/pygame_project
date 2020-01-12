@@ -27,6 +27,8 @@ k = 0
 start_k = 0
 first_time = 0
 menu_time = 0
+alt = False
+shift = False
 music_flag = True
 stop_game = False
 
@@ -148,7 +150,8 @@ def start_screen():
                       'игрок будет перемещён в стартовую точку.',
                       'Метеориты будут пролетать с периодичностью в 7с.',
                       'Будьте осторожны и внимательны:',
-                      'дорога таит в себе много опасностей... Удачи! ']
+                      'дорога таит в себе много опасностей... Удачи!',
+                      'Нажмите любую кнопку, чтобы продолжить.']
     elif lang == 'eng':
         intro_text = ["The Age of Dinosaurs", "",
                       "You are trapped in the Jurassic jungle,",
@@ -159,7 +162,8 @@ def start_screen():
                       'the player will be moved to the starting point.',
                       'Meteorites will fly in 7 seconds.',
                       "Be careful: the road is very",
-                      "dangerous... Good luck!"]
+                      "dangerous... Good luck!",
+                      'Push any button to continue.']
 
     fon = pygame.transform.scale(load_image('start_dino.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -279,6 +283,8 @@ def start_main(new_game=False, level=None):
                     stop_game = True
                     return MENU
         keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            return EXIT
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             player.rotate = False
             player.rect.x += step
@@ -307,8 +313,11 @@ def start_main(new_game=False, level=None):
             collide = pygame.sprite.groupcollide(player_sprite, volcano_group, False, False)
             if len(collide) != 0:
                 player.rect.y -= step
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[
-            pygame.K_RIGHT] and not keys[pygame.K_RIGHT] and not keys[pygame.K_d] and not keys[pygame.K_a] and not keys[
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not \
+                keys[
+                    pygame.K_RIGHT] and not keys[pygame.K_RIGHT] and not keys[pygame.K_d] and not \
+                keys[
+                    pygame.K_a] and not keys[
             pygame.K_w] and not keys[pygame.K_s]:
             player.state = False
         else:
@@ -417,16 +426,22 @@ def start_main(new_game=False, level=None):
 
 
 def menu():
-    global menu_time, k, music_flag, stop_game, lang
+    global menu_time, k, music_flag, stop_game, lang, alt, shift
     first_time = pygame.time.get_ticks()
     running = True
     fon = pygame.transform.scale(load_image('menu_back.jpg'), (width, height))
     screen.blit(fon, (0, 0))
+
+    font_rules = pygame.font.Font(None, 30)
+    xx, yy = 400, 200
+
     w = 150
     h = 50
     x = 50
+
     font_size = 60
     font = pygame.font.Font(FONT, font_size)
+
     if lang == 'ru':
         new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
@@ -539,7 +554,8 @@ def menu():
                         music_flag = True
                         music.text = 'MUSIC: ON'
 
-                if level_b.coords[0] <= pos[0] <= level_b.coords[0] + w and level_b.coords[1] <= pos[1] <= \
+                if level_b.coords[0] <= pos[0] <= level_b.coords[0] + w and level_b.coords[1] <= pos[
+                    1] <= \
                         level_b.coords[1] + h:
                     if stop_game:
                         menu_time += (last_time - first_time)
@@ -557,7 +573,8 @@ def menu():
                         play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-                        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ', choose_level)
+                        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ',
+                                         choose_level)
                         out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
                         language = Button(button_group, (width - w - 10, height - h - 10, w, h),
                                           screen, 'ENGLISH',
@@ -569,13 +586,53 @@ def menu():
                         play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
                         rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
                         table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
-                        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS', choose_level)
+                        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS',
+                                         choose_level)
                         out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
                         language = Button(button_group, (width - w - 10, height - h - 10, w, h),
                                           screen, 'RUSSIAN',
                                           terminate)
                         title = 'THE AGE OF DINOSAURS'
                     string_rendered = font.render(title, True, pygame.Color('black'))
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LSHIFT:
+                    shift = True
+                if event.key == pygame.K_LALT:
+                    alt = True
+        if shift and alt:
+            shift = False
+            alt = False
+            if lang == 'ru':
+                lang = 'eng'
+            elif lang == 'eng':
+                lang = 'ru'
+            if lang == 'ru':
+                new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА',
+                                  start_main, True)
+                play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
+                rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
+                table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
+                level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ',
+                                 choose_level)
+                out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
+                language = Button(button_group, (width - w - 10, height - h - 10, w, h),
+                                  screen, 'ENGLISH',
+                                  terminate)
+                title = 'ЭРА ДИНОЗАВРОВ'
+            elif lang == 'eng':
+                new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME',
+                                  start_main, True)
+                play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
+                rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
+                table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
+                level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS',
+                                 choose_level)
+                out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
+                language = Button(button_group, (width - w - 10, height - h - 10, w, h),
+                                  screen, 'RUSSIAN',
+                                  terminate)
+                title = 'THE AGE OF DINOSAURS'
+            string_rendered = font.render(title, True, pygame.Color('black'))
         last_time = pygame.time.get_ticks()
         if not music_flag:
             pygame.mixer.music.set_volume(0)
@@ -584,6 +641,26 @@ def menu():
         screen.fill(pygame.Color('black'))
         screen.blit(fon, (0, 0))
         screen.blit(string_rendered, (275, 0))
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            return EXIT
+        if lang == 'ru':
+            lines = ['Переключать язык можно в меню с помощью', 'кнопки или комбинации клавиш SHIFT + ALT',
+                     'Управление осуществляется стрелками', 'или клавишами WASD', 'Нажмите ESCAPE, чтобы выйти']
+        elif lang == 'eng':
+            lines = ['You can switch the language in the menu using a',
+                     'special button or a combination of keys',
+                     'SHIFT + ALT',
+                     'Control is carried out by arrows',
+                     'or keys WASD',
+                     'Press ESCAPE to exit'
+                     ]
+
+        for line in lines:
+            line = font_rules.render(line, 1, (0, 0, 0))
+            screen.blit(line, (xx, yy))
+            yy += 20
+        xx, yy = 350, 100
 
         clock.tick(FPS)
         button_group.update()
@@ -657,6 +734,20 @@ def finish():
                     if stop_game:
                         menu_time += last_time - start_time
                     return MENU
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LSHIFT:
+                    shift = True
+                if event.key == pygame.K_LALT:
+                    if shift and alt:
+                        shift = False
+                        alt = False
+                        if lang == 'ru':
+                            lang = 'eng'
+                        elif lang == 'eng':
+                            lang = 'ru'
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            return EXIT
         clock.tick(FPS)
         button_group_table.update()
         pygame.display.flip()
@@ -707,6 +798,9 @@ def lose():
                     1] <= \
                         results.coords[1] + h:
                     return RESULTS
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            return EXIT
         clock.tick(FPS)
         button_group_lose.update()
         pygame.display.flip()
@@ -742,7 +836,8 @@ def choose_level():
                 terminate()
             if event.type == pygame.MOUSEMOTION:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     cancel.mouse_down = True
                 else:
@@ -752,7 +847,8 @@ def choose_level():
                     first.mouse_down = True
                 else:
                     first.mouse_down = False
-                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[1] <= \
+                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[
+                    1] <= \
                         second.coords[1] + h:
                     second.mouse_down = True
                 else:
@@ -762,7 +858,8 @@ def choose_level():
                     third.mouse_down = True
                 else:
                     third.mouse_down = False
-                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[1] <= \
+                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[
+                    1] <= \
                         fourth.coords[1] + h:
                     fourth.mouse_down = True
                 else:
@@ -774,7 +871,8 @@ def choose_level():
                     fifth.mouse_down = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
-                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[1] <= \
+                if cancel.coords[0] <= pos[0] <= cancel.coords[0] + w and cancel.coords[1] <= pos[
+                    1] <= \
                         cancel.coords[1] + h:
                     if stop_game:
                         menu_time += last_time - start_time
@@ -782,18 +880,23 @@ def choose_level():
                 if first.coords[0] <= pos[0] <= first.coords[0] + w and first.coords[1] <= pos[1] <= \
                         first.coords[1] + h:
                     return FIRST
-                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[1] <= \
+                if second.coords[0] <= pos[0] <= second.coords[0] + w and second.coords[1] <= pos[
+                    1] <= \
                         second.coords[1] + h:
                     return SECOND
                 if third.coords[0] <= pos[0] <= third.coords[0] + w and third.coords[1] <= pos[1] <= \
                         third.coords[1] + h:
                     return THIRD
-                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[1] <= \
+                if fourth.coords[0] <= pos[0] <= fourth.coords[0] + w and fourth.coords[1] <= pos[
+                    1] <= \
                         fourth.coords[1] + h:
                     return FOURTH
                 if fifth.coords[0] <= pos[0] <= fifth.coords[0] + w and fifth.coords[1] <= pos[1] <= \
                         fifth.coords[1] + h:
                     return FIFTH
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            return EXIT
         clock.tick(FPS)
         button_group_choose.update()
         pygame.display.flip()

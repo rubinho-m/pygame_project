@@ -96,8 +96,9 @@ if __name__ == '__main__':
             all_sprites.update()
         if keys[pygame.K_DOWN]:
             player.rect.y += 10
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not keys[
-            pygame.K_RIGHT]:
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP] and not keys[pygame.K_LEFT] and not \
+                keys[
+                    pygame.K_RIGHT]:
             player.state = False
         else:
             player.state = True
