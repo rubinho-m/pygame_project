@@ -441,27 +441,7 @@ def menu():
 
     font_size = 60
     font = pygame.font.Font(FONT, font_size)
-
-    if lang == 'ru':
-        new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
-        play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
-        rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
-        table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-        out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
-        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ', choose_level)
-        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH',
-                          terminate)
-        title = 'ЭРА ДИНОЗАВРОВ'
-    elif lang == 'eng':
-        new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME', start_main, True)
-        play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
-        rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
-        table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
-        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS', choose_level)
-        out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
-        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'RUSSIAN',
-                          terminate)
-        title = 'THE AGE OF DINOSAURS'
+    new_play, play, rules, table, out, level_b, language, title = create_buttons(button_group)
     string_rendered = font.render(title, True, pygame.Color('black'))
     music = Button(button_group, (width - w, 0, w, h), screen, 'MUSIC: ON', None, True)
     if not music_flag:
@@ -606,32 +586,7 @@ def menu():
                 lang = 'eng'
             elif lang == 'eng':
                 lang = 'ru'
-            if lang == 'ru':
-                new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА',
-                                  start_main, True)
-                play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
-                rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
-                table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
-                level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ',
-                                 choose_level)
-                out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
-                language = Button(button_group, (width - w - 10, height - h - 10, w, h),
-                                  screen, 'ENGLISH',
-                                  terminate)
-                title = 'ЭРА ДИНОЗАВРОВ'
-            elif lang == 'eng':
-                new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME',
-                                  start_main, True)
-                play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
-                rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
-                table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
-                level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS',
-                                 choose_level)
-                out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
-                language = Button(button_group, (width - w - 10, height - h - 10, w, h),
-                                  screen, 'RUSSIAN',
-                                  terminate)
-                title = 'THE AGE OF DINOSAURS'
+            new_play, play, rules, table, out, level_b, language, title = create_buttons(button_group)
             string_rendered = font.render(title, True, pygame.Color('black'))
         last_time = pygame.time.get_ticks()
         if not music_flag:
@@ -902,6 +857,37 @@ def choose_level():
         pygame.display.flip()
         last_time = pygame.time.get_ticks()
     pygame.quit()
+
+
+def create_buttons(button_group):
+    global lang
+    w = 150
+    h = 50
+    x = 50
+    if lang == 'ru':
+        new_play = Button(button_group, (x, 50, w, h), screen, 'НОВАЯ ИГРА', start_main, True)
+        play = Button(button_group, (x, 150, w, h), screen, 'ИГРАТЬ', start_main)
+        rules = Button(button_group, (x, 250, w, h), screen, 'ПРАВИЛА', start_screen)
+        table = Button(button_group, (x, 350, w, h), screen, 'ЛИДЕРЫ', finish)
+        out = Button(button_group, (x, 540, w, h), screen, 'ВЫХОД', terminate)
+        level_b = Button(button_group, (x, 450, w, h), screen, 'УРОВНИ', choose_level)
+        language = Button(button_group, (width - w - 10, height - h - 10, w, h), screen, 'ENGLISH',
+                          terminate)
+        title = 'ЭРА ДИНОЗАВРОВ'
+    elif lang == 'eng':
+        new_play = Button(button_group, (x, 50, w, h), screen, 'NEW GAME',
+                          start_main, True)
+        play = Button(button_group, (x, 150, w, h), screen, 'PLAY', start_main)
+        rules = Button(button_group, (x, 250, w, h), screen, 'RULES', start_screen)
+        table = Button(button_group, (x, 350, w, h), screen, 'LEADERS', finish)
+        level_b = Button(button_group, (x, 450, w, h), screen, 'LEVELS',
+                         choose_level)
+        out = Button(button_group, (x, 540, w, h), screen, 'EXIT', terminate)
+        language = Button(button_group, (width - w - 10, height - h - 10, w, h),
+                          screen, 'RUSSIAN',
+                          terminate)
+        title = 'THE AGE OF DINOSAURS'
+    return new_play, play, rules, table, out, level_b, language, title
 
 
 tile_images = {'volcano': load_image('volcano.png'), 'empty': load_image('earth.jpg'),
