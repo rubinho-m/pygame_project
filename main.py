@@ -1,4 +1,4 @@
-import pygame
+﻿import pygame
 import os
 import sys
 import random
@@ -689,17 +689,6 @@ def finish():
                     if stop_game:
                         menu_time += last_time - start_time
                     return MENU
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LSHIFT:
-                    shift = True
-                if event.key == pygame.K_LALT:
-                    if shift and alt:
-                        shift = False
-                        alt = False
-                        if lang == 'ru':
-                            lang = 'eng'
-                        elif lang == 'eng':
-                            lang = 'ru'
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             return EXIT
